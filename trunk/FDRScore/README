@@ -1,5 +1,5 @@
 #JAS
-have adapted the FDRScore.pl to run specifically for the web.  This includes making it accept a desired FDR cutoff, including N-terminal peptides and also producing an output file with all the peptides.
+have adapted the FDRScore.pl to run specifically for the web and saved it as web_FDRScore.pl.  This includes making it accept a desired FDR cutoff, including N-terminal peptides and also producing an output file with all the peptides.
 
-note that the perlscrip TestMas..... handles file conversion from Mascot/tandem/omssa outputs to FDRScore
+note that the perlscript TestMas..... handles file conversion from Mascot/tandem/omssa outputs to FDRScore
 
