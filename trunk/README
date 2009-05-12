@@ -1,0 +1,5 @@
+#JAS
+The code here is specific to ispider.smith.man.ac.uk and the code currently only runs on the cluster and the different analysis are farmed off to the nodes of the cluster.  there are 2 different directories where the output files are stored ad this could be merged into 1.  The reason for 2 is that any files not required to be viewed directly can be sent to the /var/www/tmp/ dir however the images (pngs) and the peptide lists that are created need to be on the webserver so they can be viewed hence they are stored in /var/www/localhost/htdocs/FDRanalysis/tmp/
+
+Also to get this to work paths need to be changed for the perl_modules and the FDRscore work
+
