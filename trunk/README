@@ -3,3 +3,12 @@ The code here is specific to ispider.smith.man.ac.uk and the code currently only
 
 Also to get this to work paths need to be changed for the perl_modules and the FDRscore work
 
+FDRanalysis.pl  
+
+This script contains most of the web results.  It farms of the other perlscript to the nodes and that does all the work.  this script will check for results and will either produce a waiting page or display the results.
+
+TestMascotAllDecoySearchesInOne.pl
+
+This will do all the analysis and produce the apropriate results ... the main workhorse of the operation!
+
+
