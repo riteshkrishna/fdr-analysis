@@ -1,0 +1,2 @@
+#JAS
+have adapted the FDRScore.pl to run specifically for the web.  This includes making it accept a desired FDR cutoff, including N-terminal peptides and also producing an output file with all the peptides.
