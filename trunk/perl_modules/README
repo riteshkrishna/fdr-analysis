@@ -1,0 +1,37 @@
+#JAS
+This directory contains the perlmodules required by the web tool to do the analysis and also to create the pngs
+
+CreatePNG.pm  
+
+Does what it says on the tin.  The specific perl modules below create the data format and this module enables different charts to be produced using that data.
+
+FDRAnalysisMascotParser.pm  
+
+Parses the Mascot dat files.  Specific to the online tool as can specify the FDR desired.
+
+GetDiscriminantScorePlot.pm, GetNterminaldistribution.pm, GygiRankPlot.pm, DeltaMassPlot.pm,  ZoomDiscriminantScorePlot.pm
+
+Modules for specific images/charts
+
+DecoyMascotParser.pm
+
+Parses a Mascot Dat file which was run using the 'decoy' option in Mascot.
+
+FDRAnalysisOmssa.pm         
+
+Parses the Omssa file
+
+GetFDRValues.pm
+
+returns the results at different FDR values
+
+FDRAnalysisXTandem.pm
+
+Parses the X!Tandem files
+
+
+GetFileStatsSeperateFiles.pm 
+
+The TestMascot.... script will parse the result files for the seperate searches and then rerank these and combine them and send them to this module.
+
+
