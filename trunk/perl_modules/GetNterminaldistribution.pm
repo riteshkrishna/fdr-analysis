@@ -36,6 +36,7 @@ sub GetNtermPlot
 {
 my $se = shift;
 my $imagefile = shift;
+my $REVTAG = shift;
 my @results = @_;
 
 
@@ -67,7 +68,7 @@ my %nterm;
    {
 
    my $rev = 0;
-    if($results[$r][$rank]{'protein'} =~ m/REV\_/)
+    if($results[$r][$rank]{'protein'} =~ m/$REVTAG/)
     {
     $rev = 1;
     }   
@@ -120,10 +121,10 @@ $total[1] = 0;
 #   {
    $plotdata[1][$position] = ($nterm{$position}[0]/$total[0])*100;
 #   }
-#   if($nterm{$position}[1])
-#   {
+   if($nterm{$position}[1] && $total[1])
+   {
    $plotdata[2][$position] = ($nterm{$position}[1]/$total[1])*100; 
-#   }
+   }
   $count++;
  }
 
@@ -144,7 +145,8 @@ my $count = 0;
   }
  }
  my $title = $engine . " Nterminal Distribution";
- my $image = GetPNGBars($title,'sequence position','number spectra',$min,$max,@sorted_plot_data);
+print "in Nter score plot about to call bars\n";
+my $image = GetPNGBars($title,'sequence position','number spectra',$min,$max,@sorted_plot_data);
 
  my $mainimage = new GD::Image((450), (300));
  my $white = $mainimage->colorAllocate(255,255,255);

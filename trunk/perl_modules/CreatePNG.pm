@@ -150,7 +150,6 @@ $x_max = $x_max + ($x_max/100*10);
 my @data = @_;
 
 
-
 my $myimage;
 my $mygraph;
  #plot the values
@@ -175,10 +174,8 @@ $mygraph->set(x_tick_number=>'10');
 
 
 
-
    $mygraph->set_legend('Forward', 'Reverse');
    $myimage = $mygraph->plot(\@data) or die $mygraph->error;
-
 return $myimage;
 }
 

@@ -37,6 +37,7 @@ sub GetDeltaMassPlot
 my $imagefile = shift;
 my $scoretype = shift;
 my $setype = shift;
+my $REVTAG = shift;
 my @results = @_;
 
 my @graph;
@@ -93,16 +94,15 @@ my $max_tmp=0;
    else
    {
    $disc = sprintf("%.5f",$disc);
-   }
+  }
 
 
 
     #make the delat to 2 dp
     $results[$r][$rank]{'delta'} = sprintf("%.2f",$results[$r][$rank]{'delta'});
 
-
     #for the reverses
-    if($results[$r][$rank]{'protein'} =~ m/^REV\_/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)
+    if($results[$r][$rank]{'protein'} =~ m/^$REVTAG/)
     {  
     #reverse hits
     $delta{$results[$r][$rank]{'delta'}} = $disc;

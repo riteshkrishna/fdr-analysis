@@ -86,8 +86,15 @@ my $engine;
     $disc = $score;
     }
 
+   if($setype ne "O")
+   {
    $disc = int($disc);
-
+   }
+   else
+   {
+   $disc = log($disc);
+   $disc = sprintf("%.1f",$disc);
+   }
 
     if($disc>$max)
     {
@@ -178,7 +185,15 @@ my $count = 0;
  $count++;
  }
 
+ if($setype ne "O")
+ {
  $scoretype .= " score";
+ }
+ else
+ {
+ $scoretype = "log(expect)";
+ }
+
  my $title = $engine . " Estimation of Correct/Incorrect";
  my $image = GetPNGLines($title,$scoretype,'number spectra',$min,$max,'EC',@sorted_plot_data);
 

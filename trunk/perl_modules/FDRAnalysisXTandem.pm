@@ -291,8 +291,6 @@ my %nter = GetNterPeps($db_path);
  }
 
 
-
-
 return(\@results);
 
 
