@@ -39,6 +39,7 @@ sub GetScoreDistribution
 my $imagefile = shift;
 my $scoretype = shift;
 my $setype = shift;
+my $REVTAG = shift;
 my @results = @_;
 
 my @graph;
@@ -71,11 +72,11 @@ my $engine;
    #only rank 1
    for(my $rank=1 ; $rank<2 ; $rank++)
    {
-
    #get the identity score
    my $score = $results[$r][$rank]{'ionscore'};
    my $disc;
-    #discriminant score required?
+
+   #discriminant score required?
     if($scoretype eq "D")
     {
     my $identity = GetIdentity($results[$r][$rank]{'qmatch'});
@@ -86,7 +87,15 @@ my $engine;
     $disc = $score;
     }
 
+   if($setype ne "O")
+   {
    $disc = int($disc);
+   }
+   else
+   {
+   $disc = log($disc);
+   $disc = sprintf("%.1f",$disc);
+   } 
 
     if($disc>$max)
     {
@@ -94,7 +103,7 @@ my $engine;
     }
 
    my $rev = 0;
-    if($results[$r][$rank]{'protein'} =~ m/REV\_/)
+    if($results[$r][$rank]{'protein'} =~ m/$REVTAG/)
     {
     $rev = 1;
     }   
@@ -146,13 +155,23 @@ my $count = 0;
  $sorted_plot_data[0][$count] = $sorted[$s];
  $sorted_plot_data[1][$count] = $distribution{$sorted[$s]}[0];
  $sorted_plot_data[2][$count] = $distribution{$sorted[$s]}[1];;
+
+print "sorted_plot_data[0][$count] = $sorted[$s]\n";
+print "sorted_plot_data[1][$count] = $distribution{$sorted[$s]}[0]\n";
+print "sorted_plot_data[2][$count] = $distribution{$sorted[$s]}[1]\n\n";
  $count++;
  }
 }
- $scoretype .= " score";
+  if($setype ne "O")
+  {
+  $scoretype .= " score";
+  }
+  else
+  {
+  $scoretype = "log(expect)";
+  }
  my $title = $engine . " Score Distribution";
- my $image = GetPNGBars($title,$scoretype,'number spectra',$min,$max,@sorted_plot_data);
-
+my $image = GetPNGBars($title,$scoretype,'number spectra',$min,$max,@sorted_plot_data);
 
  my $mainimage = new GD::Image((450), (300));
  my $white = $mainimage->colorAllocate(255,255,255);
@@ -161,7 +180,6 @@ my $count = 0;
  open (CHART, ">$imagefile") or print "unable to open the $imagefile file ";
  print CHART $mainimage->png;
  close CHART;
-
 return 1;
 
 } 

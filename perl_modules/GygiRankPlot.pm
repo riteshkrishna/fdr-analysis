@@ -34,6 +34,7 @@ use CreatePNG;
 
 sub GetGygiRankPlot
 {
+my $REV_TAG = shift;
 my $se = shift;
 my $imagefile = shift;
 my $cutoff = shift;
@@ -73,7 +74,7 @@ my $max_rank = 0;
     $max_rank = $rank;
     }
 
-    if($results[$r][$rank]{'protein'} =~ m/^REV\_/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)
+    if($results[$r][$rank]{'protein'} =~ m/^$REV_TAG/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)
     {  
 
      if($graph[1][$rank])
@@ -144,7 +145,7 @@ my $image;
 
 #my $title = $engine . " Gygi Rank Plot";
 my $title = "$engine";
-
+print "in GygiRank about to call bars\n";
 $image = GetPNGBars($title,'rank','percent',$min,$max,@plotdata);
 
  my $mainimage = new GD::Image((450), (300));

@@ -31,6 +31,8 @@ use MascotParser;
 
 sub GetFDRValues
 {
+#search type is seperate or concatanated
+my $searchtype = shift;
 my $max_fdr = shift;
 my $fdrtype = shift;
 my $setype = shift;
@@ -78,13 +80,29 @@ my $minimum_score = 10000;
    #Gygi
    $fdr = 0; 
    $fdr = ($sum[1])+($sum[0]);
-   $fdr = (2*$sum[1])/$fdr;
+
+    if($searchtype == "C")
+    {
+    $fdr = (2*$sum[1])/$fdr;
+    }
+    else
+    {
+    $fdr = $sum[1]/$fdr;
+    }
    $fdr_gygi{$disc} = $fdr;
 
    #Jones
    $fdr = 0;
    $fdr = $sum[0];
-   $fdr = $sum[1]/$fdr;
+    if($searchtype == "C")
+    {
+    $fdr = $sum[1]/$fdr;
+    }
+    else
+    {
+    $fdr = $fdr+$sum[1];
+    $fdr = $fdr/$sum[1];
+    }
    $fdr_jones{$disc} = $fdr;
 
 

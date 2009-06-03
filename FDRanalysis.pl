@@ -73,8 +73,8 @@ my $page = shift;
  print	$cgi->div({id=>"main_result"},
 		$cgi->div({id=>"content"},
  				$cgi->h1("FDRAnalysis"),
-             			$cgi->p("These pages should allow you to an FDR analysis on your data.  It can accept Mascot, X!Tandem and OMSSA results.  It also provides the option to run an X!Tandem and/or OMSSA search"),
-            			$cgi->p("Please use the menu buttons above to navigate through the analysis")
+             			$cgi->p("This application enables an analysis of false discovery rates (FDR) of Mass spectrometry identification results.  Currently it can accept Mascot, X!Tandem and OMSSA results and can analyse all the searches seperately but can also combine the search from different search engines, enhancing confidence in the results."),
+            			$cgi->p("Please use the menu buttons above to run the analysis")
  	      	  		)
 			);
  
@@ -143,13 +143,16 @@ my $page = shift;
 			$cgi->br(),
                         $cgi->input({-type=>'text',-name=>'rev_tag',value=>"REV_",id=>'textarea_border',size=>"5"},'   Tag used in Decoy search'),
 			$cgi->br(),
-			$cgi->input({-type=>'checkbox',-name=>'combine',id=>'textarea_border'},'   Combine results from different search engines'),
-                        $cgi->br(),
 			$cgi->input({-type=>'text',-name=>'max_expect',value=>"0.05",id=>'textarea_border',size=>"5"},'   Maximum expectation value to use for the Rank plot'),
                         $cgi->br(),
                         $cgi->input({-type=>'text',-name=>'fdr_value',value=>"0.05",id=>'textarea_border',size=>"5"},'   FDR rate'),
                         $cgi->input({-type=>'hidden',-name=>'analysis_type'}),
  			$cgi->br(),
+			$cgi->br(),
+                        $cgi->input({-type=>'checkbox',-name=>'combine',id=>'textarea_border'},'   Combine results from different search engines'),
+                        $cgi->br(),
+                        $cgi->input({-type=>'text',-name=>'oversize',id=>'textarea_border',value=>'1',size=>'2'},'  If using an oversized decoy enter size increase here (specific to combined analysis)'),
+                        $cgi->br(),
                         $cgi->br(),	
 			),
 			$cgi->br(),	
@@ -161,7 +164,7 @@ my $page = shift;
 			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"mascot_search_type",width=>"50",values=>[" ","Mascot decoy","concatanated forward/reverse","seperate forward/reverse"]}),
  			"   Select search type",
 			$cgi->br(),
-			$cgi->input({type=>"file", id=>'textarea_border', name=>"rev_file",size=>"50",value=>"/fs/msct/data/20080704/F291465405.dat"}," Decoy/Concatanated/Reverse"),
+			$cgi->input({type=>"file", id=>'textarea_border', name=>"rev_file",size=>"50"}," Decoy/Concatanated/Reverse"),
                         $cgi->br(),
 			$cgi->input({type=>"file", id=>'textarea_border', name=>"for_file",size=>"50"}," forward"),
 			$cgi->br(),
@@ -379,6 +382,7 @@ $results_ready = 0;
    if($cgi->param("combine"))
    {
    open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
+   print PARAM "oversize\t" . $cgi->param("oversize") . "\n";
    print PARAM "combine\t" . $cgi->param("combine") . "\n";
    close PARAM;
    }
@@ -387,6 +391,7 @@ $results_ready = 0;
    open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
    print PARAM "max_expect\t" . $cgi->param("max_expect") . "\n";
    print PARAM "fdr_value\t" . $cgi->param("fdr_value") . "\n";
+   print PARAM "rev_tag\t" . $cgi->param("rev_tag") . "\n";
    close PARAM;
    $session->param('max_expect', $cgi->param("max_expect"));
    $session->param('fdr_value', $cgi->param("fdr_value"));
@@ -417,7 +422,11 @@ $results_ready = 0;
    print PARAM "tandem_image\t" . $FDR_image_file[2] . "\n";
    close PARAM;
    } 
-
+  if(!$cgi->param("rev_tag") && ($cgi->param('tandem_search_type') =~ m/concat/ || $cgi->param('mascot_search_type') =~ m/concat/ || $cgi->param('omssa_search_type') =~ m/concat/))
+  {
+  ErrorMsg("You must define the reverse tag used in a concatanated search otherwise I cannot determine which are decoy proteins!\n");
+  exit(1);
+  }
 
   if(!$cgi->param("max_expect"))
   {
@@ -549,7 +558,17 @@ open(FILE,"<$summaryfile") or print "can't open the summary $summaryfile\n";
    elsif($cgi->param("result_view") eq "combined")
    {
    my $imagefile = "http:\/\/ispider\.smith\.man\.ac\.uk\/FDRAnalysis\/tmp\/" . $session->id . "_VennDiagram.png";
-   $final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of combined results\">";
+
+    if($session->param("combine") == 1)
+    {
+    my $combinedimage = "http:\/\/ispider\.smith\.man\.ac\.uk\/FDRAnalysis\/tmp\/" . $session->id . "_CombinedVennDiagram.png";
+    $final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of Individual Identification results\"><P>This plot represents the overlap of peptide identifications after combining the results using the FDRScore* method at FDR** " . $session->param("fdr_value") . " or better.<BR><P><FONT size=-1><I>*Jones et al. (2009) Proteomics 9: 1220-9.</I><P><I>**Kall et al. (2008) J. Proteome Res. 7:29-34</I><BR><IMG SRC=\"$combinedimage\" title=\"Venn diagram of Peptides identified from the combined analysis\"><BR>";
+    }
+    else
+    {
+    $final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of Individual Identification results\">";
+    }
+
    $blurb = "<BR><P>This plot represents the overlap of peptide identification from the different search engines at FDR* " . $session->param("fdr_value") . " or better.";
    $blurb .= "<BR><font size=-2><I><b>*</b> Elias and Gygi (2007) Nat. Methods 4:207-214</i></FONT>";
    $title = "Overlap of Peptides from different search engines";
@@ -583,12 +602,12 @@ open(FILE,"<$summaryfile") or print "can't open the summary $summaryfile\n";
 						$cgi->td(
 						 $cgi->ul(
                                 		 $cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=summary"},"Summary")),
-                                			$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=rankplot"},"Rank plot")),
+							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=combined"},"Peptide Overlap")),
+$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=rankplot"},"Rank plot")),
                                				 $cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=deltamass"},"Delta Mass")),
                                 			$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=scoredist"},"Score Distribution")),
                                 			$nterminal,
-							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=zoomscore"},"Correct/Incorrect")),
-							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=combined"},"Peptide Overlap"))
+							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis.pl?content=analyse;result_view=zoomscore"},"Correct/Incorrect"))
 							)
 
 							))))),
@@ -636,50 +655,52 @@ print  $cgi->div({id=>"main_result"},
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"intro"},$cgi->p("FDR Analysis Help Page"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p("This software enables the user to analyse the results of a Mascot, Omssa and /or X!Tandem database search, particuarly an in depth look at the results from a decoy search")),
+				$cgi->p("This software enables the user to analyse the results of a Mascot, Omssa and /or X!Tandem database search.  It is specifically targetted towards searches including a decoy database, either searched speperatley or concatanated to the target database.")),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"analysis"},$cgi->p("Analysis Details"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p($cgi->b("N terminal analysis"),"if checked will include an N-terminal analysis.  This included looking at the fraction of identifications that are the N-terminal most peptide of the protein"),
-				$cgi->p($cgi->b("Decoy tag"),"We are dealing with decoy database searching.  Except for a Mascot decoy search the tag used to mark the protein accession as a decoy protein is required.  For example if the target database has accession >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'"),
-				$cgi->p($cgi->b("Combine Results"),"This employs the algorithm described in Jones et al. Proteomics (2009) 9: 1220-9 to combine the results of two or more searches from the different search engines."),
+				$cgi->p($cgi->b("N terminal analysis"),"if checked will include an N-terminal analysis, which will determine the fraction of identifications that are the N-terminal most peptide of the protein (based on the start position reported by each of the different search engines)"),
+				$cgi->p($cgi->b("Decoy tag")," This is the 'tag' used to mark which proteins are from the decoy search.  This is required when a concatanated search was performed.  It can be included if a tag was used in the decoy database of a search done seperately against target and decoy databases.  It is not required for a Mascot decoy search.  For example if the target database has accession >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'.  <B>Please note that the tag must be at the start of the protein accession and have no spaces between it and the protein</B>.."),
+				$cgi->p($cgi->b("Combine Results"),"This employs the algorithm described in Jones et al. Proteomics (2009) 9: 1220-9 to combine the results of two or more searches from the different search engines.  This search can take a few extra minutes (depending on file sizes) and so please be patient."),
+				$cgi->p($cgi->b("Maximum Expectation value"),"Related to one of the resulting plots, useful for investigating the results."),
+ 				$cgi->p($cgi->b("FDR rate"),"The false discovery rate (FDR) you would liek the results for."),
   				),	
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"mascot_files"},$cgi->p("Mascot File(s) Upload"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-                                $cgi->p($cgi->b("Search type")," There are 3 types of decoy search a concatanated forward/decoy whereby the target and decoy databases were joined and one search was performed.  a Mascot decoy search whereby the 'decoy' checkbox was selected in the Mascot search and finally two searches, one on the target database and a second on the decoy database."),
+                                $cgi->p($cgi->b("Search type")," There are 3 types of decoy search a concatanated target/decoy whereby the target and decoy databases were joined and one search was performed.  A Mascot decoy search whereby the 'decoy' checkbox was selected in the Mascot search and finally two searches, one on the target database and a second on the decoy database. Mascot '.dat' files are expected here."),
 				$cgi->p("The first file upload box is the main upload box and is for any file except the search run soley on the target database, which the second box will contain if applicable."),
 				),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"omssa_files"},$cgi->p("OMSSA/X!Tandem File(s) Upload"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p($cgi->b("Search type")," There are 2 types of decoy search for both search engines, a concatanated forward/decoy whereby the target and decoy databases were joined and one search was performed or where two searches were performed one on the target database and a second on the decoy database."), 
+				$cgi->p($cgi->b("Search type")," There are 2 types of decoy search for both search engines, a concatanated target/decoy whereby the target and decoy databases were joined and one search was performed or where two searches were performed one on the target database and a second on the decoy database. OMSSA '.csv' result files and X!Tandem '.xml' result files are expected here."), 
 				$cgi->p("The first file upload box is the main upload box and is for any file except the search run soley on the target database, which the second box will contain if applicable."),
 				),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_summary"},$cgi->p("Results Pages - summary"))),
 			        $cgi->div({id=>"innerbox",align=>"left"},
-			        $cgi->p("A simple table displays the peptide frequencies identified from the search at FDR 0.05.  There are two different FDR calculation methods .... see ....."),
+			        $cgi->p("A simple table displays the peptide frequencies identified from the search at the chosen FDR.  There are two different FDR calculation methods the first based on a method described by Elias & Gygi (2007) Nat. Methods 4: 207-214 and the second a method described by Kall et al. (2008) J. Proteome Res. 7:29-34.  If a combined search was selected these results will be displayed in the table on this page also.  This page also enables the user to download a text file containing a tab seperated file of all the peptides and associated proteins identified by the different search engines at the chosen FDR. "),
 				),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_rank"},$cgi->p("Results Pages - Rank Plot"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p("Rank plots are shown for the different search engines used in the query form.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot."),
+				$cgi->p(" If target and decoy peptides are equally likey to be selected as matches, lower ranked peptides (which are assumed to be incorrect) should be evenly distributed between the decoy and database portions.  The top ranking identifications on the otherhand are assumed to be correct and so should have a large bias towards target peptides.  The e-value cut-off for the top ranking peptides can be changed on the query for, the default is 0.05.  Rank plots are shown for the different search engines used in the query form.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot."),
 				),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_delta"},$cgi->p("Results Pages - Delta Mass Plot"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p(" Delta Mass plots are shown for the different search engines used in the query form.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot."),
+				$cgi->p("Delta Mass plots are shown for the different search engines used in the query form.  These plots represent the difference in mass between the calculated and experimental masses at different scores.  They are based on Elias & Gygi (2007) Nat. Methods 4: 207-214.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot."),
                                 ),
                                 $cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_score"},$cgi->p("Results Pages - Score Distribution"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-			        $cgi->p("Score distribution plots are shown for the different search engines used in the query form. "),
+			        $cgi->p("Score distribution plots are shown for the different search engines used in the query form and can be used to look at the distribution of decoy and target identifications at different scores.  Peptides with lower scores are less likely to be correct and so these plots should show an approximate equal districution of target/decoy peptides at low scores, but a clear difference in the two at higher scores. "),
 	                        ),	
                                 $cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_correct"},$cgi->p("Results Pages - Correct/Incorrect"))),
 				$cgi->div({id=>"innerbox",align=>"left"},
-				$cgi->p("Correct/Incorrect plots are shown for the different search engines used in the query form. They should give an indication of the score distributions of the forward and reverse hits."),
+				$cgi->p("Correct/Incorrect plots are shown for the different search engines used in the query form. They are based on those described in Elias & Gygi (2007) Nat. Methods 4: 207-214.  For seperate searches estimated correct identifications were calculated by subtracting  the number of decoy peptides from target peptides at a given score threshold, and incorrect identifications were estimated as the minumum number of target or decoy peptides returned at a given score.  For concatanated search correct identifications were estimated by subtracting twice the number of decoy peptides at a given score threshold and incorrect estimated by doubling the number of decoy peptides at a given threshold."),
                                 ),
 				$cgi->div({id=>"innerboxheader"},
 				$cgi->a({name=>"results_nter"},$cgi->p("Results Pages - Nterminal Distribution"))),
@@ -854,6 +875,7 @@ my $omssa_for;
 my $omssa_rev;
 my $tandem_for;
 my $tandem_rev;
+my $oversize = 1;
 
 #get the parameters
 open(FILE,"<$param_file") or die "RunAnalysis unable to open the params file $param_file\n";
@@ -962,11 +984,15 @@ open(FILE,"<$param_file") or die "RunAnalysis unable to open the params file $pa
   $image =~ s/\n//g;
   $cmd .= " -e $image ";
   } 
+  elsif($split[0] =~ m/oversize/)
+  {
+  $oversize = $split[1];
+  }
   elsif($split[0] =~ m/combine/) 
   {
    if($split[1] =~ /on/)
    {
-   $cmd .= " -z "; 
+   $cmd .= " -z $oversize"; 
    }
   }
   elsif($split[0] =~ m/max\_expect/)
@@ -981,6 +1007,15 @@ open(FILE,"<$param_file") or die "RunAnalysis unable to open the params file $pa
   $value =~ s/\n//g;
   $cmd .= " -w $value ";
   }
+  elsif($split[0] =~ m/rev\_tag/)
+  {
+  my $value = $split[1];
+  $value =~ s/\n//g;
+   if($value)
+   {
+   $cmd .= " -t $value ";
+   }
+  }
  }
 close FILE;
 
@@ -989,7 +1024,7 @@ $cmd .= "  -s /var/www/tmp/" . $session->id . " ";
 
 #$cmd .= " &"; #this MUST be commented out if using QSUB!!!
 #system($cmd);
-#print "cmd is $cmd\n";
+print "cmd is $cmd\n";
 my $shell = "/tmp/RunFDRAnalysis_" . $session->id . ".sh";
 
 open(SHELL,">$shell") or die "unable to create a shell file, $shell\n";

@@ -29,8 +29,8 @@ use FDRAnalysisOmssa;
 use DecoyMascotParser;
 use DeltaMassPlot;
 use GygiRankPlot;
-use GetFileStats;
-use GetFDRPlot;
+##use GetFileStats;
+##use GetFDRPlot;
 use GetFDRValues;
 use GetDiscriminantScorePlot;
 use ZoomDiscriminantScorePlot;
@@ -46,7 +46,7 @@ use List::Util qw[min max];
 ########################################################################
 
 our($opt_w,$opt_k,$opt_c, $opt_m, $opt_f, $opt_d, $opt_r, $opt_q, $opt_s, $opt_o, $opt_n, $opt_h, $opt_l, $opt_t, $opt_p, $opt_b, $opt_x, $opt_e, $opt_j, $opt_y, $opt_a, $opt_z, $opt_g, $opt_u, $opt_v, $opt_i);
-getopts('c:m:f:d:r:q:s:o:n:ht:l:p:b:x:e:j:y:a:zg:u:v:i:k:w:');
+getopts('c:m:f:d:r:q:s:o:n:ht:l:p:b:x:e:j:y:a:z:g:u:v:i:k:w:');
 
    if($opt_h)
    {
@@ -120,7 +120,7 @@ system($cmd);
  #Omssa
  if($opt_r)
  {
- OmssaConcat($opt_r)
+OmssaConcat($opt_r)
  }
  if($opt_p && $opt_i)
  {
@@ -429,18 +429,14 @@ sub RunAndysStuff
  {
  #remove the files
  my $cmd = "rm " . $opt_s . "*combined*out";
-system($cmd);
+ system($cmd);
 
-print "about to run the command\n";
-
-
-#my $cmd = "/fs/san/home/mjfssjs2/LIVERPOOL/bin/perl_scripts/andys_MS-Weighted.pl ";
-my $cmd = "perl /fs/san/home/mjfssjs2/FDRScore_March09/MultipleSearch/web_FDRScore.pl ";
-$cmd .= "-F $jones_combined_file -R 1 -I $opt_t -O ". $opt_s . "combined_results.out -P " . $opt_s . "combined_proteins.out -Q " . $opt_s . "combined_peptides.out -T " . $opt_w; 
-
-system($cmd);
-
+ #my $cmd = "/fs/san/home/mjfssjs2/LIVERPOOL/bin/perl_scripts/andys_MS-Weighted.pl ";
+ my $cmd = "perl /fs/san/home/mjfssjs2/FDRScore_March09/MultipleSearch/web_FDRScore.pl ";
+ $cmd .= "-F $jones_combined_file -D $opt_z -R 1 -I $opt_t -O ". $opt_s . "combined_results.out -P " . $opt_s . "combined_proteins.out -Q " . $opt_s . "combined_peptides.out -T " . $opt_w; 
 print "andys command is $cmd\n";
+
+system($cmd);
 
  ParseCombined();
  CreateSummary();
@@ -451,19 +447,29 @@ print "andys command is $cmd\n";
  system($cmd);
 
 
- my $imagefile = $opt_s . "_VennDiagram.png";
+ my $imagefile = $opt_s . "_CombinedVennDiagram.png";
  $imagefile =~ s/\/var\/www\/tmp\//\/var\/www\/localhost\/htdocs\/FDRAnalysis\/tmp\//;
+ my $peplist = $opt_s . "_peptidelist.txt";
+ my $comblist = $opt_s . "combined_peptides.out";
+ my @values = GetVennNumbersFromCombine($comblist);
 
+
+  if(!GetPNGVenn($imagefile,@values))
+  {
+  print "Error trying to run the GetPNGVenn\n";
+  exit(1);
+  }
  } 
  else
  {
-print "About to create the peptidelist and summary\n";
  CreateSummary();
  CreatePeptideList();
  } 
 
 #also want to create the venn diagram for the peptide
-my @values = GetVennNumbers();
+my $peplist = $opt_s . "_peptidelist.txt";
+my @values = GetVennNumbers($peplist);
+
 my $imagefile = $opt_s . "_VennDiagram.png";
 $imagefile =~ s/\/var\/www\/tmp\//\/var\/www\/localhost\/htdocs\/FDRAnalysis\/tmp\//;
 
@@ -473,17 +479,156 @@ $imagefile =~ s/\/var\/www\/tmp\//\/var\/www\/localhost\/htdocs\/FDRAnalysis\/tm
  exit(1);
  }
 
-print "Venn diagram should have been created\n";
 
 
 }
+
+sub GetVennNumbersFromCombine
+{
+my $combine = shift;
+
+my @res;
+my %peps;
+my @seen;
+
+open(FILE,"<$combine") or die "unable to open the results file $combine\n";
+ while(my $line = <FILE>)
+ {
+ my @split = split/\t/,$line;
+ my $seq = $split[1];
+ my $m = $split[4];
+ my $o = $split[5];
+ my $t = $split[6];
+
+  if($m)
+  {
+  $seen[1] = 1;
+  $peps{$seq}[1] = 1;
+  }
+  if($o)
+  {
+  $seen[2] = 1;
+  $peps{$seq}[2] = 1;
+  }
+  if($t)
+  {
+  $seen[3] = 1;
+  $peps{$seq}[3] = 1;
+  }
+ }
+close FILE;
+
+ if($seen[1])
+ {
+ $res[0][1] = "Mascot";
+ }
+ if($seen[2])
+ {
+ $res[0][2] = "Omssa";
+ }
+ if($seen[3])
+ {
+ $res[0][3] = "X!Tandem";
+ }
+
+
+  #for all the peptides in the file
+  foreach my $seq (keys %peps)
+  {
+  my $m = $peps{$seq}[1];
+  my $o = $peps{$seq}[2];
+  my $t = $peps{$seq}[3];
+
+   if($m && $o && $t)
+   {
+    if($res[0][0])
+    {
+    $res[0][0]++;
+    }
+    else
+    {
+    $res[0][0]=1;
+    }
+   }
+   elsif($m && $o)
+   {
+    if($res[1][2])
+    {
+    $res[1][2]++;
+    }
+    else
+    {
+    $res[1][2] = 1;
+    }
+   }
+   elsif($m && $t)
+   {
+    if($res[1][3])
+    {
+    $res[1][3]++;
+    }
+    else
+    {
+    $res[1][3]=1;
+    }
+   }
+   elsif($o && $t)
+   {
+    if($res[2][3])
+    {
+    $res[2][3]++;
+    }
+    else
+    {
+    $res[2][3] = 1;
+    }
+   }
+   elsif($m)
+   {
+    if($res[1][0])
+    {
+    $res[1][0]++;
+    }
+    else
+    {
+    $res[1][0]=1;
+    }
+   }
+   elsif($o)
+   {
+    if($res[2][0])
+    {
+    $res[2][0]++;
+    }
+    else
+    {
+    $res[2][0] = 1;
+    }
+   }
+   elsif($t)
+   {
+    if($res[3][0])
+    {
+    $res[3][0]++;
+    }
+    else
+    {
+    $res[3][0]=1;
+    }
+   } 
+  }
+
+return @res;
+
+}
+
 
 sub GetVennNumbers
 {
 
 
 #peptidelist
-my $newpeplist = $opt_s . "_peptidelist.txt";
+my $newpeplist = shift;
 
 my %peps;
 my @res;
@@ -603,7 +748,6 @@ my %tmplabels;
   }
   else
   {
-print "missed sequence is $seq\n";
    if($res[3][3])
    {
    $res[3][3]++;
@@ -627,15 +771,13 @@ return @res;
 
  my %res;
  my $file = $opt_s . "combined_peptides.out";
-print "looking at file $file\n";
 
 #open the peptide results
  open(FILE,"<$file") or print "problem with Combined results ($file)\n";
   while(my $line = <FILE>)
   {
   my @split = split/\t/,$line;
-  $res{$split[0]}{$split[1]} = $split[2];
-  print "adding res{$split[0]}{$split[1]} = $split[2]\n";
+  $res{$split[0]}{$split[1]} = $split[3];
   }
  close FILE;
 
@@ -649,13 +791,11 @@ my $nter = 0;
   if($fdr>=$opt_w)
   {
 
-  print "The FDR $fdr matched\n";
    foreach my $seq (keys %{$res{$fdr}})
    {
     if(!$observed{$seq})
     {
-print "LOOK $seq\n";
-$observed{$seq} = 1;
+    $observed{$seq} = 1;
     $count++;
      if($res{$fdr}{$seq}<3)
      {
@@ -665,7 +805,6 @@ $observed{$seq} = 1;
    }
   } 
  } 
- print "count is $count\n";
  $summary_table{'C'}{'K'}{$opt_w}[0] = $count;
  $summary_table{'C'}{'K'}{$opt_w}[1] = $nter;
 
@@ -677,9 +816,8 @@ $observed{$seq} = 1;
  my $mascotfile = $opt_d;
  my $db = GetDbPath($mascotfile);
  my $mgf = "";
- my $ptr = ParseDecoyMascot($mascotfile,$mgf,$db,'H','0.05');
+ my $ptr = ParseDecoyMascot($mascotfile,$mgf,$db,'H','0.05',$opt_t);
  my @resultsTwo = @{$ptr};
-
  my $ptr = ParseMascot($mascotfile,$mgf,$db,'H','0.05');
  my @results = @{$ptr};
 
@@ -691,42 +829,8 @@ $observed{$seq} = 1;
  my $max  = max(scalar(@results),scalar(@resultsTwo));
 
  my @new_results = ProduceUber($max,\@results,\@resultsTwo);
+ my @reranked_results = ProduceUberReRanked($max,\@results,\@resultsTwo);
 
-
-my $n = 0;
-my $in = 0;
-my $rn = 0;
-my $rin = 0;
-
-for(my $s = 0 ; $s<scalar(@new_results) ; $s++)
-{
- for(my $r=2 ; $r<11 ; $r++) 
- {
-  if($new_results[$s][$r]{'sequence'})
-  {
-   if($new_results[$s][$r]{'protein'} =~ m/^REV\_/)
-   {
-    if($new_results[$s][$r]{'start'}<3)
-    {
-    $rn++;
-    }
-    else
-    {
-    $rin++;
-    }
-   }
-   elsif($new_results[$s][$r]{'start'}<3)
-   {
-   $n++;
-   }
-   else
-   {
-   $in++;
-   }
-  }
- }
-}
-print "for nter is $n for internal is $in revese internal is $rin reverse nter is $rn\n";
 
  my @image;
 my $fdrtype = 0;
@@ -735,7 +839,6 @@ my $fdrtype = 0;
   $fdrtype = $opt_q;
   }
 
- my $setype = "M";
 
  my $scoretype = "S";
 
@@ -748,7 +851,7 @@ my $fdrtype = 0;
   }
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','M',$opt_n,$opt_t,@new_results);
+ my %all_results = GetFDRValues('S',$opt_w,'0','M',$opt_n,$opt_t,@new_results);
  
  my %gygi_results;
  my %jones_results;
@@ -773,17 +876,17 @@ my $fdrtype = 0;
  #deltamass plot
  my $plot = $imagefile;
  $plot =~ s/\.png/DeltaMass\.png/;
- GetDeltaMassPlot($plot,$scoretype,$setype,@new_results);
+ GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@new_results);
 
  #gygi rank plot
  my $plot = $imagefile;
  $plot =~ s/\.png/GygiRank\.png/;
- GetGygiRankPlot($setype,$plot,$opt_k,@new_results);
-
+# GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@new_results);
+GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@reranked_results);
  #Score distribution
  my $plot = $imagefile;
  $plot =~ s/\.png/ScoreDist\.png/;
- GetScoreDistribution($plot,$scoretype,$setype,@new_results);
+ GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@new_results);
 
  #Zoom score plot
  my $plot = $imagefile;
@@ -796,7 +899,7 @@ my $fdrtype = 0;
   #nter plot
   my $plot = $imagefile;
   $plot =~ s/\.png/NterDist\.png/;
-  GetNtermPlot($setype,$plot,@new_results);
+  GetNtermPlot($setype,$plot,$opt_t,@new_results);
   }
 
  }
@@ -862,12 +965,6 @@ my $fdrtype = 0;
  my @new_results = ProduceUber($max,\@results,\@resultsTwo);
 
 
-my $n = 0;
-my $in = 0;
-my $rn = 0;
-my $rin = 0;
-
-
   #if combining the result
   if($opt_z && $setype eq "O")
   {
@@ -894,7 +991,7 @@ my $fdrtype = 0;
  my $scoretype = "S";
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','M',$opt_n,$opt_t,@new_results);
+ my %all_results = GetFDRValues('S',$opt_w,'0','M',$opt_n,$opt_t,@new_results);
  
  my %gygi_results;
  my %jones_results;
@@ -919,17 +1016,17 @@ AddToPeptideList($setype,$plot,\%all_results);
 #deltamass plot
 my $plot = $imagefile;
 $plot =~ s/\.png/DeltaMass\.png/;
-GetDeltaMassPlot($plot,$scoretype,$setype,@new_results);
+GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@new_results);
 
 #gygi rank plot
 my $plot = $imagefile;
 $plot =~ s/\.png/GygiRank\.png/;
-GetGygiRankPlot($setype,$plot,$opt_k,$opt_k,@new_results);
+GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,$opt_k,@new_results);
 
 #Score distribution
 my $plot = $imagefile;
 $plot =~ s/\.png/ScoreDist\.png/;
-GetScoreDistribution($plot,$scoretype,$setype,@new_results);
+GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@new_results);
 
 #Zoom score plot
 my $plot = $imagefile;
@@ -941,13 +1038,58 @@ ZoomScoreDistribution($plot,$scoretype,$setype,@new_results);
 #nter plot
 my $plot = $imagefile;
 $plot =~ s/\.png/NterDist\.png/;
-GetNtermPlot($setype,$plot,@new_results);
+GetNtermPlot($setype,$plot,$opt_t,@new_results);
   }
 
  }
 
 
- sub ProduceUber
+sub ProduceUber
+{
+
+ my $max = shift;
+ my $ptr = shift;
+ my $ptr2 = shift;
+ my @results = @{$ptr};
+ my @resultsTwo = @{$ptr2};
+
+ my @new_results;
+my $size = scalar(@results);
+print "target is " . scalar(@results) . " and the decoy is " . scalar(@resultsTwo) . "\n";
+ for(my $r=0 ; $r<$max ; $r++)
+ {
+ #find the maximum hit
+  for(my $k=1 ; $k<11 ; $k++)
+  {
+   if($resultsTwo[$r][$k]{'sequence'})
+   {
+   $size++;
+   foreach my $attr (keys %{$resultsTwo[$r][$k]})
+    {
+     if($attr eq "protein")
+     {
+      if($resultsTwo[$r][$k]{$attr} !~ m/^$opt_t/)
+      {
+      $resultsTwo[$r][$k]{$attr} = $opt_t . $resultsTwo[$r][$k]{$attr};
+      }
+     }
+    $new_results[$size][$k]{$attr} = $resultsTwo[$r][$k]{$attr};
+    }
+   }
+  
+   if($results[$r][$k]{'sequence'})
+   {
+    foreach my $attr (keys %{$results[$r][$k]})
+    {
+    $new_results[$r][$k]{$attr} = $results[$r][$k]{$attr};
+    }
+   }
+  } 
+ }
+return @new_results;
+}
+
+ sub ProduceUberReRanked
  {
  my $max = shift;
  my $ptr = shift;
@@ -969,6 +1111,7 @@ my $count = 0;
    #is there a reverse hit?
    if($resultsTwo[$r][$k]{'sequence'})
    {
+    #no target hit
     if(!$new_results[$r][$rank+1]{'ionscore'})
     {
     $rank++;
@@ -976,6 +1119,14 @@ my $count = 0;
      {
       foreach my $attr (keys %{$resultsTwo[$r][$k]})
       {
+       #make sure there is a tag on the prot - if not add one! 
+       if($attr eq "protein")
+       {
+        if($resultsTwo[$r][$k]{$attr} !~ m/^$opt_t/)
+        {
+        $resultsTwo[$r][$k]{$attr} = $opt_t . $resultsTwo[$r][$k]{$attr};
+        }
+       }	
       $new_results[$r][$rank]{$attr} = $resultsTwo[$r][$k]{$attr};
       }
      }
@@ -996,6 +1147,16 @@ my $count = 0;
      {
       foreach my $attr (keys %{$resultsTwo[$r][$k]})
       {
+
+       #make sure there is a tag on the prot - if not add one!
+       if($attr eq "protein")
+       {
+        if($resultsTwo[$r][$k]{$attr} !~ m/^$opt_t/)
+        {
+        $resultsTwo[$r][$k]{$attr} = $opt_t . $resultsTwo[$r][$k]{$attr};
+        }
+       }
+
       $new_results[$r][$rank]{$attr} = $resultsTwo[$r][$k]{$attr};
       }
      }
@@ -1018,6 +1179,14 @@ my $count = 0;
        }
        foreach my $attr (keys %{$results[$r][$k]})
        {
+        #make sure there is a tag on the prot - if not add one!
+        if($attr eq "protein")
+        {
+         if($resultsTwo[$r][$k]{$attr} !~ m/^$opt_t/)
+         {
+         $resultsTwo[$r][$k]{$attr} = $opt_t . $resultsTwo[$r][$k]{$attr};
+         }
+        }
        $new_results[$r][$position]{$attr} = $resultsTwo[$r][$k]{$attr};
        }
       $position = 11;
@@ -1026,6 +1195,15 @@ my $count = 0;
       {
        foreach my $attr (keys %{$results[$r][$k]})
        {
+
+       #make sure there is a tag on the prot - if not add one!
+       if($attr eq "protein")
+       { 
+        if($resultsTwo[$r][$k]{$attr} !~ m/^$opt_t/)
+        {
+        $resultsTwo[$r][$k]{$attr} = $opt_t . $resultsTwo[$r][$k]{$attr};
+        }
+       }
        $new_results[$r][$rank+2]{$attr} = $resultsTwo[$r][$k]{$attr};
        }
       }
@@ -1140,7 +1318,7 @@ my $count = 0;
  my $imagefile = $opt_j;
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','O',$opt_n,$opt_t,@results);
+ my %all_results = GetFDRValues('C',$opt_w,'0','O',$opt_n,$opt_t,@results);
  
  my %gygi_results;
  my %jones_results;
@@ -1155,7 +1333,6 @@ my $count = 0;
   }
 
  
-
  #summary file
  my $plot = $imagefile;
  $plot =~ s/\.png/Summary\.txt/;
@@ -1165,17 +1342,17 @@ my $count = 0;
  #deltamass plot
  my $plot = $imagefile;
  $plot =~ s/\.png/DeltaMass\.png/;
- GetDeltaMassPlot($plot,$scoretype,$setype,@results);
+ GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@results);
 
  #gygi rank plot
  my $plot = $imagefile;
  $plot =~ s/\.png/GygiRank\.png/;
- GetGygiRankPlot($setype,$plot,$opt_k,@results);
+ GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@results);
 
  #Score distribution
  my $plot = $imagefile;
  $plot =~ s/\.png/ScoreDist\.png/;
- GetScoreDistribution($plot,$scoretype,$setype,@results);
+ GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@results);
 
  #Zoom score plot
  my $plot = $imagefile;
@@ -1188,7 +1365,7 @@ my $count = 0;
   #nter plot
   my $plot = $imagefile;
   $plot =~ s/\.png/NterDist\.png/;
-  GetNtermPlot($setype,$plot,@results);
+  GetNtermPlot($setype,$plot,$opt_t,@results);
   }
 
 
@@ -1203,6 +1380,7 @@ my $count = 0;
  my($ptr1) = ParseTandem($tandemfile,$input,$taxonomy);
  my @results = @{$ptr1};
 
+
   if($opt_z)
   {
   SimpleCount('Tandem',@results);
@@ -1214,7 +1392,7 @@ my $count = 0;
  my $imagefile = $opt_e;
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','T',$opt_n,$opt_t,@results);
+ my %all_results = GetFDRValues('C',$opt_w,'0','T',$opt_n,$opt_t,@results);
  
  my %gygi_results;
  my %jones_results;
@@ -1239,32 +1417,30 @@ my $count = 0;
  #deltamass plot
  my $plot = $imagefile;
  $plot =~ s/\.png/DeltaMass\.png/;
- GetDeltaMassPlot($plot,$scoretype,$setype,@results);
+ GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@results);
 
  #gygi rank plot
  my $plot = $imagefile;
  $plot =~ s/\.png/GygiRank\.png/;
- GetGygiRankPlot($setype,$plot,$opt_k,@results);
+ GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@results);
 
  #Score distribution
  my $plot = $imagefile;
  $plot =~ s/\.png/ScoreDist\.png/;
- GetScoreDistribution($plot,$scoretype,$setype,@results);
+GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@results);
 
  #Zoom score plot
  my $plot = $imagefile;
  $plot =~ s/\.png/ZoomScore\.png/;
  ZoomScoreDistribution($plot,$scoretype,$setype,@results);
 
-
   if($opt_n)
   {
   #nter plot
   my $plot = $imagefile;
   $plot =~ s/\.png/NterDist\.png/;
-  GetNtermPlot($setype,$plot,@results);
+  GetNtermPlot($setype,$plot,$opt_t,@results);
   }
-
  }
 
 
@@ -1296,7 +1472,7 @@ my $count = 0;
  }
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','M',$opt_n,$opt_t,@results);
+ my %all_results = GetFDRValues('C',$opt_w,'0','M',$opt_n,$opt_t,@results);
 
 my %gygi_results;
 my %jones_results;
@@ -1320,17 +1496,17 @@ my %jones_results;
  #deltamass plot
  my $plot = $imagefile;
  $plot =~ s/\.png/DeltaMass\.png/;
- GetDeltaMassPlot($plot,$scoretype,$setype,@results);
+ GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@results);
 
  #gygi rank plot
  my $plot = $imagefile;
  $plot =~ s/\.png/GygiRank\.png/;
- GetGygiRankPlot($setype,$plot,$opt_k,@results);
+ GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@results);
 
  #Score distribution
  my $plot = $imagefile;
  $plot =~ s/\.png/ScoreDist\.png/;
- GetScoreDistribution($plot,$scoretype,$setype,@results);
+GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@results);
 
  #Zoom score plot
  my $plot = $imagefile;
@@ -1342,7 +1518,7 @@ my %jones_results;
   #nter plot
   my $plot = $imagefile;
   $plot =~ s/\.png/NterDist\.png/;
-  GetNtermPlot($setype,$plot,@results);
+  GetNtermPlot($setype,$plot,$opt_t,@results);
   }
 
  }
@@ -1363,7 +1539,7 @@ my @image;
 
 
  #Get the actual FDR values for both Gyig and Jones method
- my %all_results = GetFDRValues($opt_w,'0','M',$opt_n,$opt_t,@results);
+ my %all_results = GetFDRValues('C',$opt_w,'0','M',$opt_n,$opt_t,@results);
  
  my %gygi_results;
  my %jones_results;
@@ -1388,17 +1564,17 @@ AddToPeptideList($setype,$plot,\%all_results);
 my $plot = $imagefile;
 $plot =~ s/\.png/DeltaMass\.png/;
 #print "whats this $plot?\n";
-GetDeltaMassPlot($plot,$scoretype,$setype,@results);
+GetDeltaMassPlot($plot,$scoretype,$setype,$opt_t,@results);
 
 #gygi rank plot
 my $plot = $imagefile;
 $plot =~ s/\.png/GygiRank\.png/;
-GetGygiRankPlot($setype,$plot,$opt_k,@results);
+GetGygiRankPlot($opt_t,$setype,$plot,$opt_k,@results);
 
 #Score distribution
 my $plot = $imagefile;
 $plot =~ s/\.png/ScoreDist\.png/;
-GetScoreDistribution($plot,$scoretype,$setype,@results);
+GetScoreDistribution($plot,$scoretype,$setype,$opt_t,@results);
 
 #Zoom score plot
 my $plot = $imagefile;
@@ -1407,28 +1583,14 @@ ZoomScoreDistribution($plot,$scoretype,$setype,@results);
 
 
 
-# push(@image,GetStats($scoretype,$fdrtype,$setype,$opt_n,@results));
-
-# push(@image,GetDeltaMassPlot($scoretype,$setype,@results));
-# push(@image,GetGygiRankPlot(@results));
-# push(@image,GetFDR($scoretype,$fdrtype,$setype,@results));
-# push(@image,GetScoreDistribution($scoretype,$setype,@results));
-# push(@image,ZoomScoreDistribution($scoretype,$setype,@results));
 
   if($opt_n)
   {
-#  push(@image,GetNtermPlot(@results));
 my $plot = $imagefile;
 $plot =~ s/\.png/NterDist\.png/;
-GetNtermPlot($setype,$plot,@results);
-#  GetFinalPNGNter($imagefile,@image);
+GetNtermPlot($setype,$plot,$opt_t,@results);
   }
-#  else
-#  {
-#  GetFinalPNG($imagefile,@image);
-#  }
 
-print "imagefile is $imagefile\n";
 
  return $imagefile;
 }
@@ -1453,7 +1615,7 @@ my @results = @{$ptr2};
    if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL")
    {
     #is the score bigger than the threshold for this fdr and forward?
-    if($results[$s][$r]{'ionscore'} >= $fdr{$f} && $results[$s][$r]{'proteinlist'} !~ m/^REV/ && $results[$s][$r]{'proteinlist'} !~ m/\#\*\#REV/)
+    if($results[$s][$r]{'ionscore'} >= $fdr{$f} && $results[$s][$r]{'proteinlist'} !~ m/^$opt_t/ && $results[$s][$r]{'proteinlist'} !~ m/\#\*\#REV/)
     {
     #is it nter?
      if($results[$s][$r]{'start'}<3 && !$gygi_results{$file}{$f}[0])
@@ -1510,7 +1672,7 @@ $protein =~ s/\_\_/\_/g;
 $protein =~ s/SR\_//g;
 $protein =~ s/\_SS\d+//;
 $protein =~ s/\_SR\_//;
-if($protein =~ m/^REV\_/)
+if($protein =~ m/^$opt_t/)
 {
 my @split = split/\_/,$protein;
 $protein = $split[0] . "_" . $split[1];
@@ -1568,7 +1730,7 @@ $protein =~ s/\_\_/\_/g;
 $protein =~ s/SR\_//g;
 $protein =~ s/\_SS\d+//;
 $protein =~ s/\_SR\_//;
-if($protein =~ m/^REV\_/)
+if($protein =~ m/^$opt_t/)
 {
 my @split = split/\_/,$protein;
 $protein = $split[0] . "_" . $split[1];
@@ -1632,7 +1794,7 @@ my @results = @{$ptr2};
    if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL")
    {
     #is the score bigger than the threshold for this fdr and forward?
-    if($results[$s][$r]{'ionscore'} >= $fdr{$f} && $results[$s][$r]{'proteinlist'} !~ m/^REV/ && $results[$s][$r]{'proteinlist'} !~ m/\#\*\
+    if($results[$s][$r]{'ionscore'} >= $fdr{$f} && $results[$s][$r]{'proteinlist'} !~ m/^$opt_t/ && $results[$s][$r]{'proteinlist'} !~ m/\#\*\
 #REV/)
     {
 
@@ -1726,7 +1888,7 @@ open(RES,">>$jones_combined_file") or die "unable to open the file $jones_combin
    $results[$s][$rank]{'protein'} =~ s/\_SS\d+//;
    $results[$s][$rank]{'protein'} =~ s/\_SR\_//;
     #what about the frayed proteins?
-    if($results[$s][$rank]{'protein'} =~ m/^REV\_/)
+    if($results[$s][$rank]{'protein'} =~ m/^$opt_t/)
     {
     my @split = split/\_/,$results[$s][$rank]{'protein'};
     $results[$s][$rank]{'protein'} = $split[0] . "_" . $split[1];
@@ -1847,6 +2009,7 @@ print "\t\t-p\tOmssa forward only file\n";
 print "\t\t-i\tOmssa reverse only file\n";
 print "\t\t-a\tname of db single omssa searched\n";
 print "\n\tAnalysis Settings\n";
+print "\t\t-w\tFDR threshold to use\n";
 print "\t\t-z\tCombine SearchEngine Results using Kall method\n";
 print "\t\t-t\tDecoy tag (default REV_)\n";
 print "\t\t-q\tFDR type (0 (default) =  Gygi, 1 = Kall)\n";

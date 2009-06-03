@@ -50,6 +50,7 @@ my $mgf_file = shift;
 my $db_path = shift;
 my $output_type = shift;
 my $cutoff = shift;
+my $REVTAG = shift;
 my @spectrum_number;
 
 
@@ -236,17 +237,16 @@ open (MASCOTFILE,"<$mascot_file") or die "unable to open the mascot file, $masco
       $protein = $split2[0];
       $start = $split2[2];
       }
-      if($protein && $split2[0]=~ m/^REV\_/)
+      if($protein && $split2[0]=~ m/^$REVTAG/)
       {
       $protein = $split2[0];
       $start = $split2[2];
       }   
      }
-
     $results[$spectrum_number[$num[0]]][$num[1]]{'sequence'} = $tmp2[4];
     $results[$spectrum_number[$num[0]]][$num[1]]{'ionscore'} = $tmp2[7];
     $results[$spectrum_number[$num[0]]][$num[1]]{'start'} = $start;
-    $results[$spectrum_number[$num[0]]][$num[1]]{'protein'} = "REV_" . $protein;
+    $results[$spectrum_number[$num[0]]][$num[1]]{'protein'} = $protein;
     $results[$spectrum_number[$num[0]]][$num[1]]{'expect'} = GetExpect($tmp2[7],$results[$spectrum_number[$num[0]]][1]{'qmatch'});
     $results[$spectrum_number[$num[0]]][$num[1]]{'delta'} = $tmp2[2];
     }
@@ -335,12 +335,12 @@ my %nter;
      #does it meet the search criteria?
      if($results[$r][$rank]{'expect'} < $cutoff)
      {
-      if($results[$r][$rank]{'protein'} =~ m/^REV\_/ && !$unique_rev{$results[$r][$rank]{'sequence'}})
+      if($results[$r][$rank]{'protein'} =~ m/^$REVTAG/ && !$unique_rev{$results[$r][$rank]{'sequence'}})
       {
       $rev++;
       $unique_rev{$results[$r][$rank]{'sequence'}} = 1;
       }
-      elsif(!$unique_peptides{$results[$r][$rank]{'sequence'}} && $results[$r][$rank]{'nterminal'} == 1 && $results[$r][$rank]{'protein'} !~ m/^REV\_/)
+      elsif(!$unique_peptides{$results[$r][$rank]{'sequence'}} && $results[$r][$rank]{'nterminal'} == 1 && $results[$r][$rank]{'protein'} !~ m/^$REVTAG/)
       {
       $nter++;
       $unique_peptides{$results[$r][$rank]{'sequence'}} = 1;

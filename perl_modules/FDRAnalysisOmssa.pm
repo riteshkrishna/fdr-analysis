@@ -109,12 +109,18 @@ my %protein_group;
 my $pep_count = 1;
 my $query = 0;
 
+my $NIST = 0;
+
 open(RES,"<$OMSSA") or return "ERROR: There is a problem opening the OMSSA results, $OMSSA\n";
  while(my $line = <RES>)
  {
   #ignore the first line
   if($line =~m /^Spectrum\s+number/)
   {
+   if($line =~ m/NIST\s+score/)
+   {
+   $NIST = 1;
+   }
   next;
   }
   else
@@ -135,14 +141,31 @@ open(RES,"<$OMSSA") or return "ERROR: There is a problem opening the OMSSA resul
   #omssa makes the residues with mods lower case - change them to upper
   $seq = uc($seq);
   my $mh = $tmp[4];
+  my $size  = scalar(@tmp);
+  #BUG FIX for large omssa description lines
+  $tmp[12] = $tmp[$size-3];
+
   my $delta = $tmp[12] - $tmp[4];
   my $eval = $tmp[3];
   #if there is more than one mod in the variable sequence omssa puts commas therefore get the p val as the last element of the array
   my $last = scalar(@tmp) - 1;
+   #BUG FIX for omssa results that have a NIST result
+   $last = $last - $NIST;
   my $pval = $tmp[$last];
   $pval =~ s/\n//;
-   my @split_prot = split/\|/,$tmp[9];
-  my $prot = $split_prot[0];
+
+#   my @split_prot = split/\|/,$tmp[9];
+#  my $prot = $split_prot[0];
+  my $prot = $tmp[6];
+
+
+#BUG FIX - Needs looking at
+   #if the protein accession in 6 is all numbers use the start of the description line??
+   if($prot !~ m/[ABCDEFGHIJKLMNOPQRSTUVQXYZ]/)
+   {
+   my @split_prot = split/\s+/,$tmp[9];
+   $prot = $split_prot[0];
+   }
   my $start = $tmp[7];
   my $end = $tmp[8];
   my $title = $tmp[1];
@@ -211,13 +234,15 @@ open(RES,"<$OMSSA") or return "ERROR: There is a problem opening the OMSSA resul
   $results[$query][$pep_count]{'expect'} = $eval;
   $results[$query][$pep_count]{'pvalue'} = $pval;
   my $ionscore = 0;
-   if($pval>0)
-   { 
-   $ionscore = log($pval);
-   }
-  $ionscore = $ionscore/log(10);
-  $ionscore = $ionscore*-10;
-  $results[$query][$pep_count]{'ionscore'} = $ionscore;
+#   if($pval>0)
+#   { 
+#   $ionscore = log($pval);
+#   }
+#  $ionscore = $ionscore/log(10);
+#  $ionscore = $ionscore*-10;
+$ionscore = $eval;
+
+$results[$query][$pep_count]{'ionscore'} = $ionscore;
   $results[$query][$pep_count]{'protein'} = $prot;
   $results[$query][$pep_count]{'start'} = $start;
   $results[$query][$pep_count]{'end'} = $end;
