@@ -1,0 +1,285 @@
+<html>
+<link rel="stylesheet" href="fdranalysis.css">
+
+<div id="navigation">
+	<table width="100%">
+		<tr>
+ 			<td> <a href="FDR_analysis_home.html"> <img width="60" height="50" alt="link to home" src="home.jpg"></a>
+ 			<td> <a href="FDR_analysis_search.html"> <img width="60" height="50" alt="link to search" src="search.jpg"></a>
+ 			<td> <a href="FDR_analysis_analyse.html"> <img width="60" height="50" alt="link to analysis" src="analysis.jpg"></a>
+ 			<td> <a href="FDR_analysis_help.html"> <img width="60" height="50" alt="link to home" src="help.jpg"></a>
+ 			<td> <a href="mailto:david.wedge\@manchester.ac.uk"> <img width="60" height="50" alt="link to home" src="contact.jpg"></a>
+		</tr>
+	</table>
+</div>
+
+<div id="main_result">
+<div id="content">
+<form name="fdr_search" action="FDR_analysis_analyse.html", method="post">
+	<br>
+	<h2>Parameters for the FDR Analysis</h2>
+	<br>
+	<div id="innerboxtable">
+		<div id="innerboxheader">
+			<p> File Upload
+		</div>
+		<br>
+		<div innerbox align=left>
+			File 1: <input type="file" name="input1" id="textarea_border" size="50"/>
+			<br>
+			File type
+			<input type="radio" name="group1" checked/> Mascot
+			<input type="radio" name="group1" /> OMSSA
+			<input type="radio" name="group1" /> X!Tandem
+			<br>
+			<br>
+			File 2: <input type="file" name="input2" id="textarea_border" size="50"/>
+			<br>
+			File type
+			<input type="radio" name="group2" /> Mascot
+			<input type="radio" name="group2" checked/> OMSSA
+			<input type="radio" name="group2" /> X!Tandem
+			<br>
+			<br>
+			File 3: <input type="file" name="input3" id="textarea_border" size="50"/>
+			<br>
+			File type
+			<input type="radio" name="group3" /> Mascot
+			<input type="radio" name="group3" /> OMSSA
+			<input type="radio" name="group3" checked/> X!Tandem
+		</div>
+		<div id="innerboxheader">
+			<p> Parameters for the FDR analysis
+		</div>
+		<div id="innerbox" align="left">
+			The options in this section allow you to tune the analysis to your dataset and search characteristics.
+			<br>
+			<br>
+			 <input type="checkbox" name='nter' id="textarea_border">  Include N terminal analysis
+			<img height ="20" alt="N-terminal help" src ="help.jpg"  onclick ="window.open('help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');">
+			<br>
+			<input type="text" name="rev_tag" value="REV_" id="textarea_border" size="5">   Tag used in Decoy search
+			<img height ="20" alt="Decoy tag help" src ="help.jpg" onclick ="window.open('help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');">
+			<br>
+			<input type="text" name="max_expect" value="0.05" id="textarea_border" size="5">   Maximum expectation value to use for the Rank plot
+			<img height ="20" alt="Expectation value help" src ="help.jpg" onclick ="window.open('help_page.pl?content=expectation_value','helpwindow','width=450,height=250');">
+			<br>
+			<input type="text" name="fdr_value" value="0.05" id="textarea_border" size="5">   FDR rate
+			<input type="hidden" name="analysis_type">
+			<img height ="20" alt="FDR help" src ="help.jpg", onclick ="window.open('help_page.pl?content=FDR','helpwindow','width=450,height=250');">
+			<br>
+			<br>
+			<input type="checkbox" name="combine" id="textarea_border">   Combine results from different search engines
+			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
+			<br>
+			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  If using an oversized decoy enter size increase here (specific to combined analysis)
+			<br>
+			<br>
+		</div>
+		<div id="innerboxheader">
+			<p> File Info
+		</div>
+		<div id="innerbox" align="left">
+			The information below is optional as it is not needed for the FDR analysis. However, if you want to obtain your results as correct, fully annotated mzident files, please select the appropriate options below.
+			<input type="text" name="missed_cleavages" value="1" id="textarea_border" size="2">   Number of missed cleavages
+			<img height ="20" alt="Missed cleavages help" src ="help.jpg" onclick ="window.open('help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');">
+			<br>
+			<br>
+			Parent mass type:
+			<input type="radio" name="parent_mass_type" checked/> monoisotopic
+			<input type="radio" name="parent_mass_type" /> average
+			<img height ="20" alt="Parent mass type help" src ="help.jpg", onclick ="window.open('help_page.pl?content=parent_mass_type','helpwindow','width=450,height=250');">
+			<br>
+			Parent tolerance ±
+			<input type="text" name="parent_tolerance" value="1.0" id="textarea_border" size="2" align="right">
+			<select name="parent_units" id="textarea_border" width="50">
+				<option value="Da">Da
+				<option value="ppm">ppm
+			</select>
+			<br>
+			<br>
+			Fragment mass type:
+			<input type="radio" name="fragment_mass_type" checked/> monoisotopic
+			<input type="radio" name="fragment_mass_type" /> average
+			<img height ="20" alt="Fragment mass type help" src ="help.jpg", onclick ="window.open('help_page.pl?content=fragment_mass_type','helpwindow','width=450,height=250');">
+			<br>
+			Fragment tolerance ±
+			<input type="text" name="fragment_tolerance" value="1.0" id="textarea_border" size="2" align="right">
+			<select name="fragment_units" id="textarea_border" width="50">
+				<option value="Da">Da
+				<option value="ppm">ppm
+			</select>
+			<br>
+			<br>
+			<SELECT NAME="enzyme"  id="textarea_border">
+			      <OPTION SELECTED>Trypsin</OPTION>
+			      <OPTION>Arg-C</OPTION>
+			      <OPTION>Asp-N</OPTION>
+			      <OPTION>Asp-N_ambic</OPTION>
+			      <OPTION>Chymotrypsin</OPTION>
+			      <OPTION>CNBr</OPTION>
+			      <OPTION>CNBr+Trypsin</OPTION>
+			      <OPTION>Formic_acid</OPTION>
+			      <OPTION>Lys-C</OPTION>
+			      <OPTION>Lys-C/P</OPTION>
+			      <OPTION>PepsinA</OPTION>
+			      <OPTION>Tryp-CNBr</OPTION>
+			      <OPTION>TrypChymo</OPTION>
+			      <OPTION>Trypsin/P</OPTION>
+			      <OPTION>V8-DE</OPTION>
+			      <OPTION>V8-E</OPTION>
+			      <OPTION>semiTrypsin</OPTION>
+			      <OPTION>LysC+AspN</OPTION>
+			      <OPTION>None</OPTION>
+			      <OPTION>No_cleavage</OPTION>
+			</SELECT>
+			Select enzyme
+			<img height ="20" alt= "Select enzyme help" src ="help.jpg", onclick ="window.open('help_page.pl?content=enzyme','helpwindow','width=450,height=250');">
+			<br>
+			<br>
+			<SELECT NAME="fixed_mods" MULTIPLE SIZE="5" id="textarea_border">
+			      <OPTION>Acetyl (K)</OPTION>
+			      <OPTION>Acetyl (N-term)</OPTION>
+			      <OPTION>Acetyl (Protein N-term)</OPTION>
+			      <OPTION>Amidated (C-term)</OPTION>
+			      <OPTION>Amidated (Protein C-term)</OPTION>
+			      <OPTION>Ammonia-loss (N-term C)</OPTION>
+			      <OPTION>Biotin (K)</OPTION>
+			      <OPTION>Biotin (N-term)</OPTION>
+			      <OPTION>Carbamidomethyl (C)</OPTION>
+			      <OPTION>Carbamyl (K)</OPTION>
+			      <OPTION>Carbamyl (N-term)</OPTION>
+			      <OPTION>Carboxymethyl (C)</OPTION>
+			      <OPTION>Cation:Na (C-term)</OPTION>
+			      <OPTION>Cation:Na (DE)</OPTION>
+			      <OPTION>Deamidated (NQ)</OPTION>
+			      <OPTION>Dehydrated (N-term C)</OPTION>
+			      <OPTION>Dehydro (C)</OPTION>
+			      <OPTION>Dioxidation (M)</OPTION>
+			      <OPTION>Ethanolyl (C)</OPTION>
+			      <OPTION>ExacTagAmine (K)</OPTION>
+			      <OPTION>ExacTagThiol (C)</OPTION>
+			      <OPTION>Formyl (N-term)</OPTION>
+			      <OPTION>Formyl (Protein N-term)</OPTION>
+			      <OPTION>Gln-&gt;pyro-Glu (N-term Q)</OPTION>
+			      <OPTION>Glu-&gt;pyro-Glu (N-term E)</OPTION>
+			      <OPTION>Guanidinyl (K)</OPTION>
+			      <OPTION>ICAT-C (C)</OPTION>
+			      <OPTION>ICAT-C:13C(9) (C)</OPTION>
+			      <OPTION>ICPL (K)</OPTION>
+			      <OPTION>ICPL (Protein N-term)</OPTION>
+			      <OPTION>ICPL:13C(6) (K)</OPTION>
+			      <OPTION>ICPL:13C(6) (Protein N-term)</OPTION>
+			      <OPTION>ICPL:2H(4) (K)</OPTION>
+			      <OPTION>ICPL:2H(4) (Protein N-term)</OPTION>
+			      <OPTION>iTRAQ4plex (K)</OPTION>
+			      <OPTION>iTRAQ4plex (N-term)</OPTION>
+			      <OPTION>iTRAQ4plex (Y)</OPTION>
+			      <OPTION>iTRAQ8plex (K)</OPTION>
+			      <OPTION>iTRAQ8plex (N-term)</OPTION>
+			      <OPTION>iTRAQ8plex (Y)</OPTION>
+			      <OPTION>Label:18O(1) (C-term)</OPTION>
+			      <OPTION>Label:18O(2) (C-term)</OPTION>
+			      <OPTION>Met-&gt;Hse (C-term M)</OPTION>
+			      <OPTION>Met-&gt;Hsl (C-term M)</OPTION>
+			      <OPTION>Methyl (C-term)</OPTION>
+			      <OPTION>Methyl (DE)</OPTION>
+			      <OPTION>Methylthio (C)</OPTION>
+			      <OPTION>NIPCAM (C)</OPTION>
+			      <OPTION>Oxidation (HW)</OPTION>
+			      <OPTION>Oxidation (M)</OPTION>
+			      <OPTION>Phospho (ST)</OPTION>
+			      <OPTION>Phospho (Y)</OPTION>
+			      <OPTION>Propionamide (C)</OPTION>
+			      <OPTION>Pyridylethyl (C)</OPTION>
+			      <OPTION>Pyro-carbamidomethyl (N-term C)</OPTION>
+			      <OPTION>Sulfo (S)</OPTION>
+			      <OPTION>Sulfo (T)</OPTION>
+			      <OPTION>Sulfo (Y)</OPTION>
+			      <OPTION>TMT (K)</OPTION>
+			      <OPTION>TMT (N-term)</OPTION>
+			      <OPTION>TMT2plex (K)</OPTION>
+			      <OPTION>TMT2plex (N-term)</OPTION>
+			      <OPTION>TMT6plex (K)</OPTION>
+			      <OPTION>TMT6plex (N-term)</OPTION>
+    			</SELECT>
+				Select fixed mods
+				<img height ="20" alt="Select fixed mods help" src ="help.jpg", onclick ="window.open('help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');">
+				<br>
+				<br>
+				<SELECT NAME="variable_mods" MULTIPLE SIZE="5" id="textarea_border">
+			      <OPTION>Acetyl (K)</OPTION>
+			      <OPTION>Acetyl (N-term)</OPTION>
+			      <OPTION>Acetyl (Protein N-term)</OPTION>
+			      <OPTION>Amidated (C-term)</OPTION>
+			      <OPTION>Amidated (Protein C-term)</OPTION>
+			      <OPTION>Ammonia-loss (N-term C)</OPTION>
+			      <OPTION>Biotin (K)</OPTION>
+			      <OPTION>Biotin (N-term)</OPTION>
+			      <OPTION>Carbamidomethyl (C)</OPTION>
+			      <OPTION>Carbamyl (K)</OPTION>
+			      <OPTION>Carbamyl (N-term)</OPTION>
+			      <OPTION>Carboxymethyl (C)</OPTION>
+			      <OPTION>Cation:Na (C-term)</OPTION>
+			      <OPTION>Cation:Na (DE)</OPTION>
+			      <OPTION>Deamidated (NQ)</OPTION>
+			      <OPTION>Dehydrated (N-term C)</OPTION>
+			      <OPTION>Dehydro (C)</OPTION>
+			      <OPTION>Dioxidation (M)</OPTION>
+			      <OPTION>Ethanolyl (C)</OPTION>
+			      <OPTION>ExacTagAmine (K)</OPTION>
+			      <OPTION>ExacTagThiol (C)</OPTION>
+			      <OPTION>Formyl (N-term)</OPTION>
+			      <OPTION>Formyl (Protein N-term)</OPTION>
+			      <OPTION>Gln-&gt;pyro-Glu (N-term Q)</OPTION>
+			      <OPTION>Glu-&gt;pyro-Glu (N-term E)</OPTION>
+			      <OPTION>Guanidinyl (K)</OPTION>
+			      <OPTION>ICAT-C (C)</OPTION>
+			      <OPTION>ICAT-C:13C(9) (C)</OPTION>
+			      <OPTION>ICPL (K)</OPTION>
+			      <OPTION>ICPL (Protein N-term)</OPTION>
+			      <OPTION>ICPL:13C(6) (K)</OPTION>
+			      <OPTION>ICPL:13C(6) (Protein N-term)</OPTION>
+			      <OPTION>ICPL:2H(4) (K)</OPTION>
+			      <OPTION>ICPL:2H(4) (Protein N-term)</OPTION>
+			      <OPTION>iTRAQ4plex (K)</OPTION>
+			      <OPTION>iTRAQ4plex (N-term)</OPTION>
+			      <OPTION>iTRAQ4plex (Y)</OPTION>
+			      <OPTION>iTRAQ8plex (K)</OPTION>
+			      <OPTION>iTRAQ8plex (N-term)</OPTION>
+			      <OPTION>iTRAQ8plex (Y)</OPTION>
+			      <OPTION>Label:18O(1) (C-term)</OPTION>
+			      <OPTION>Label:18O(2) (C-term)</OPTION>
+			      <OPTION>Met-&gt;Hse (C-term M)</OPTION>
+			      <OPTION>Met-&gt;Hsl (C-term M)</OPTION>
+			      <OPTION>Methyl (C-term)</OPTION>
+			      <OPTION>Methyl (DE)</OPTION>
+			      <OPTION>Methylthio (C)</OPTION>
+			      <OPTION>NIPCAM (C)</OPTION>
+			      <OPTION>Oxidation (HW)</OPTION>
+			      <OPTION>Oxidation (M)</OPTION>
+			      <OPTION>Phospho (ST)</OPTION>
+			      <OPTION>Phospho (Y)</OPTION>
+			      <OPTION>Propionamide (C)</OPTION>
+			      <OPTION>Pyridylethyl (C)</OPTION>
+			      <OPTION>Pyro-carbamidomethyl (N-term C)</OPTION>
+			      <OPTION>Sulfo (S)</OPTION>
+			      <OPTION>Sulfo (T)</OPTION>
+			      <OPTION>Sulfo (Y)</OPTION>
+			      <OPTION>TMT (K)</OPTION>
+			      <OPTION>TMT (N-term)</OPTION>
+			      <OPTION>TMT2plex (K)</OPTION>
+			      <OPTION>TMT2plex (N-term)</OPTION>
+			      <OPTION>TMT6plex (K)</OPTION>
+			      <OPTION>TMT6plex (N-term)</OPTION>
+    			</SELECT>
+				Select variable mods
+				<img height ="20" alt="Select variable mods help" src ="help.jpg", onclick ="window.open('help_page.pl?content=variable_mods','helpwindow','width=450,height=250');">
+				<br>
+				<br>
+		</div>
+	</div>
+</form>
+</div>
+</div>
+</html>
