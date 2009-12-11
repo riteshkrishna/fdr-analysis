@@ -125,13 +125,15 @@ my $page = shift;
  $session->flush();
 
 
- my $cmd = "rm /var/www/localhost/htdocs/FDRAnalysis/tmp/*fdranalysis_" . $cgi->cookie("CGISESSID") . "*.png";
+ #my $cmd = "rm /var/www/localhost/htdocs/FDRAnalysis/tmp/*fdranalysis_" . $cgi->cookie("CGISESSID") . "*.png";
+ my $cmd = "rm /var/www/localhost/htdocs/FDRAnalysis/tmp/*" . $cgi->cookie("CGISESSID") . "*.png"; #DCW - delete all png files
  system($cmd); 
 
  print  $cgi->div({id=>"main_result"},
                 $cgi->div({id=>"content"},
 			#$cgi->start_form(-name=>'fdr_search', -method=>"post"),
-			$cgi->start_form(-name=>'fdr_search',-action=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse", -method=>"post"),
+			$cgi->start_form(-name=>'fdr_search',-action=>"FDRanalysis_NEW.pl?content=analyse", -method=>"post"),
+
 			$cgi->br(),
  			$cgi->h2("Parameters for the FDR Analysis"),
 			$cgi->br(),
@@ -141,37 +143,37 @@ my $page = shift;
                         $cgi->div({id=>"innerbox",align=>"left"},
  			$cgi->br(),
                         $cgi->input({-type=>'checkbox',-name=>'nter',id=>'textarea_border'},'   Include N terminal analysis'),
-			$cgi->img({height => "20", alt=>"N-terminal help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"N-terminal help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
-                        $cgi->input({-type=>'text',-name=>'rev_tag',value=>"REV_",id=>'textarea_border',size=>"5"},'   Tag used in Decoy search'),
-			$cgi->img({height => "20", alt=>"Decoy tag help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');"}),
+                     $cgi->input({-type=>'text',-name=>'rev_tag',value=>"REV_",id=>'textarea_border',size=>"5"},'   Tag used in Decoy search'),
+			$cgi->img({height => "20", alt=>"Decoy tag help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
 			$cgi->input({-type=>'text',-name=>'max_expect',value=>"0.05",id=>'textarea_border',size=>"5"},'   Maximum expectation value to use for the Rank plot'),
-			$cgi->img({height => "20", alt=>"Expectation value help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=expectation_value','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Expectation value help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=expectation_value','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({-type=>'text',-name=>'fdr_value',value=>"0.05",id=>'textarea_border',size=>"5"},'   FDR rate'),
                         $cgi->input({-type=>'hidden',-name=>'analysis_type'}),
-			$cgi->img({height => "20", alt=>"FDR help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=FDR','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"FDR help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=FDR','helpwindow','width=450,height=250');"}),
  			$cgi->br(),
 			$cgi->br(),
                         $cgi->input({-type=>'checkbox',-name=>'combine',id=>'textarea_border'},'   Combine results from different search engines'),
-			$cgi->img({height => "20", alt=>"Combine results help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=combine_results','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Combine results help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=combine_results','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({-type=>'text',-name=>'oversize',id=>'textarea_border',value=>'1',size=>'2'},'  If using an oversized decoy enter size increase here (specific to combined analysis)'),
                         $cgi->br(),
 			$cgi->br(),
                         $cgi->input({-type=>'text',-name=>'missed_cleavages',value=>"1",id=>'textarea_border',size=>"2"},'   Number of missed cleavages'),
-			$cgi->img({height => "20", alt=>"Missed cleavages help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Missed cleavages help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->br(),
 			"Parent mass type:  ",$cgi->radio_group({type=>"radio_group",name=>"parent_mass_type", values=>["monoisotopic","average"], default=>"monoisotopic"}),
-			$cgi->img({height => "20", alt=>"Parent mass type help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=parent_mass_type','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Parent mass type help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=parent_mass_type','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
 			"Parent tolerance ± ",$cgi->input({-type=>'text',-name=>'parent_tolerance',value=>"1.0",id=>'textarea_border',size=>"2",align=>"right"}),
 			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"parent_units",width=>"50",values=>["Da","ppm"]}),
                         $cgi->br(),
 			"Fragment mass type:  ",$cgi->radio_group({type=>"radio_group",name=>"fragment_mass_type", values=>["monoisotopic","average"], default=>"monoisotopic"}),
-			$cgi->img({height => "20", alt=>"Fragment mass type help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=fragment_mass_type','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Fragment mass type help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=fragment_mass_type','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
 			"Fragment tolerance ± ",$cgi->input({-type=>'text',-name=>'fragment_tolerance',value=>"0.5",id=>'textarea_border',size=>"2",align=>"right"}),
 			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"fragment_units",width=>"50",values=>["Da","ppm"]}),
@@ -179,16 +181,16 @@ my $page = shift;
                         $cgi->br(),
 			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"enzyme",width=>"50",values=>["Trypsin","Arg-C","Asp-N","Asp-N_ambic","Chymotrypsin","CNBr","CNBr+Trypsin","Formic_acid","Lys-C","Lys-C/P","PepsinA","Tryp-CNBr","TrypChymo","Trypsin/P","V8-DE","V8-E","semiTrypsin","LysC+AspN","None","No_cleavage"]}),
  			"   Select enzyme",
-			$cgi->img({height => "20", alt=>"Select enzyme help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=enzyme','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Select enzyme help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=enzyme','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
                      $cgi->br(),
 			$cgi->popup_menu({id=>'textarea_border', name=>"fixed_mods",width=>"50",selectmode =>"multiple",multiple=>"5",values=>["Acetyl(K)","Acetyl(N-term)","Acetyl(ProteinN-term)","Amidated(C-term)","Amidated(ProteinC-term)","Ammonia-loss(N-termC)","Biotin(K)","Biotin(N-term)","Carbamidomethyl(C)","Carbamyl(K)","Carbamyl(N-term)","Carboxymethyl(C)","Cation:Na(C-term)","Cation:Na(DE)","Deamidated(NQ)","Dehydrated(N-termC)","Dehydro(C)","Dioxidation(M)","Ethanolyl(C)","ExacTagAmine(K)","ExacTagThiol(C)","Formyl(N-term)","Formyl(ProteinN-term)","Gln-&gt;pyro-Glu(N-termQ)","Glu-&gt;pyro-Glu(N-termE)","Guanidinyl(K)","ICAT-C(C)","ICAT-C:13C(9)(C)","ICPL(K)","ICPL(ProteinN-term)","ICPL:13C(6)(K)","ICPL:13C(6)(ProteinN-term)","ICPL:2H(4)(K)","ICPL:2H(4)(ProteinN-term)","iTRAQ4plex(K)","iTRAQ4plex(N-term)","iTRAQ4plex(Y)","iTRAQ8plex(K)","iTRAQ8plex(N-term)","iTRAQ8plex(Y)","Label:18O(1)(C-term)","Label:18O(2)(C-term)","Met-&gt;Hse(C-termM)","Met-&gt;Hsl(C-termM)","Methyl(C-term)","Methyl(DE)","Methylthio(C)","NIPCAM(C)","Oxidation(HW)","Oxidation(M)","Phospho(ST)","Phospho(Y)","Propionamide(C)","Pyridylethyl(C)","Pyro-carbamidomethyl(N-termC)","Sulfo(S)","Sulfo(T)","Sulfo(Y)","TMT(K)","TMT(N-term)","TMT2plex(K)","TMT2plex(N-term)","TMT6plex(K)","TMT6plex(N-term)"]}),
  			"   Select fixed mods",
-			$cgi->img({height => "20", alt=>"Select fixed mods help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Select fixed mods help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
 			$cgi->br(),
 			$cgi->popup_menu({id=>'textarea_border', name=>"variable_mods",width=>"50",selectmode =>"multiple",multiple=>"5",values=>["Acetyl(K)","Acetyl(N-term)","Acetyl(ProteinN-term)","Amidated(C-term)","Amidated(ProteinC-term)","Ammonia-loss(N-termC)","Biotin(K)","Biotin(N-term)","Carbamidomethyl(C)","Carbamyl(K)","Carbamyl(N-term)","Carboxymethyl(C)","Cation:Na(C-term)","Cation:Na(DE)","Deamidated(NQ)","Dehydrated(N-termC)","Dehydro(C)","Dioxidation(M)","Ethanolyl(C)","ExacTagAmine(K)","ExacTagThiol(C)","Formyl(N-term)","Formyl(ProteinN-term)","Gln-&gt;pyro-Glu(N-termQ)","Glu-&gt;pyro-Glu(N-termE)","Guanidinyl(K)","ICAT-C(C)","ICAT-C:13C(9)(C)","ICPL(K)","ICPL(ProteinN-term)","ICPL:13C(6)(K)","ICPL:13C(6)(ProteinN-term)","ICPL:2H(4)(K)","ICPL:2H(4)(ProteinN-term)","iTRAQ4plex(K)","iTRAQ4plex(N-term)","iTRAQ4plex(Y)","iTRAQ8plex(K)","iTRAQ8plex(N-term)","iTRAQ8plex(Y)","Label:18O(1)(C-term)","Label:18O(2)(C-term)","Met-&gt;Hse(C-termM)","Met-&gt;Hsl(C-termM)","Methyl(C-term)","Methyl(DE)","Methylthio(C)","NIPCAM(C)","Oxidation(HW)","Oxidation(M)","Phospho(ST)","Phospho(Y)","Propionamide(C)","Pyridylethyl(C)","Pyro-carbamidomethyl(N-termC)","Sulfo(S)","Sulfo(T)","Sulfo(Y)","TMT(K)","TMT(N-term)","TMT2plex(K)","TMT2plex(N-term)","TMT6plex(K)","TMT6plex(N-term)"]}), 			"   Select variable mods",
-			$cgi->img({height => "20", alt=>"Select variable mods help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=variable_mods','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Select variable mods help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=variable_mods','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
 			$cgi->br()
 			),
@@ -201,13 +203,13 @@ my $page = shift;
 			$cgi->br(),
 			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"mascot_search_type",width=>"50",values=>[" ","Mascot decoy","concatenated forward/reverse","separate forward/reverse"]}),
  			"   Select search type",
-			$cgi->img({height => "20", alt=>"Mascot search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=mascot_search','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Mascot search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=mascot_search','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
 			$cgi->input({type=>"file", id=>'textarea_border', name=>"rev_file",size=>"50"}," Decoy/Concatenated/Reverse"),
-			$cgi->img({height => "20", alt=>"Mascot decoy files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=mascot_decoy_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Mascot decoy files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=mascot_decoy_files','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
 			$cgi->input({type=>"file", id=>'textarea_border', name=>"for_file",size=>"50"}," Forward"),
-			$cgi->img({height => "20", alt=>"Mascot forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=mascot_forward_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"Mascot forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=mascot_forward_files','helpwindow','width=450,height=250');"}),
 			$cgi->br(),
                         $cgi->br(),
 			),
@@ -217,17 +219,17 @@ my $page = shift;
                         $cgi->br(),
  			$cgi->input({type=>"text",id=>'textarea_border', name=>"omssa_software_version",size=>"5",value=>"2.14"}),
 			"   OMSSA software version",
-			$cgi->img({height => "20", alt=>"OMSSA version help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=OMSSA_version','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"OMSSA version help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=OMSSA_version','helpwindow','width=450,height=250');"}),
                        $cgi->br(),
   			$cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"omssa_search_type",width=>"50",values=>[" ","concatenated forward/reverse","separate forward/reverse"]}),
 			"   Select search type",
-			$cgi->img({height => "20", alt=>"OMSSA search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=OMSSA_search','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"OMSSA search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('FDRAnalysis/help_page.pl?content=OMSSA_search','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({type=>"file", id=>'textarea_border', name=>"omssa_rev_file",size=>"50",value=>""}," Concatenated/Reverse"),
-			$cgi->img({height => "20", alt=>"OMSSA reverse files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=OMSSA_decoy_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"OMSSA reverse files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=OMSSA_decoy_files','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({type=>"file", id=>'textarea_border', name=>"omssa_for_file",size=>"50"}," Forward"),
-			$cgi->img({height => "20", alt=>"OMSSA forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=OMSSA_forward_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"OMSSA forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=OMSSA_forward_files','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
 
 			$cgi->br(),
@@ -238,17 +240,17 @@ my $page = shift;
                         $cgi->br(),
 			$cgi->input({type=>"text",id=>'textarea_border', name=>"omssa_software_version",size=>"15",value=>"2008.12.1.1"}),
 			"   X!Tandem software version",
-			$cgi->img({height => "20", alt=>"X!Tandem version help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=Tandem_version','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"X!Tandem version help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=Tandem_version','helpwindow','width=450,height=250');"}),
                        $cgi->br(),
                         $cgi->popup_menu({type=>"popup_menu",id=>'textarea_border', name=>"tandem_search_type",width=>"50",values=>[" ","concatenated forward/reverse","separate forward/reverse"]}),
  			"   Select search type",
-			$cgi->img({height => "20", alt=>"X!Tandem search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=Tandem_search','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"X!Tandem search help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=Tandem_search','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({type=>"file", id=>'textarea_border', name=>"tandem_rev_file",size=>"50",value=>""}," Concatenated/Reverse"),
-			$cgi->img({height => "20", alt=>"X!Tandem reverse files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=Tandem_decoy_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"X!Tandem reverse files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=Tandem_decoy_files','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
                         $cgi->input({type=>"file", id=>'textarea_border', name=>"tandem_for_file",size=>"50"}," Forward"),
-			$cgi->img({height => "20", alt=>"X!Tandem forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('http://ispider.smith.man.ac.uk/cgi-bin/FDRAnalysis/help_page.pl?content=Tandem_forward_files','helpwindow','width=450,height=250');"}),
+			$cgi->img({height => "20", alt=>"X!Tandem forward files help", src => "http://ispider.smith.man.ac.uk/FDRAnalysis/help.jpg", onclick =>"window.open('help_page.pl?content=Tandem_forward_files','helpwindow','width=450,height=250');"}),
                         $cgi->br(),
 			$cgi->br(),
                         $cgi->input({-type=>"hidden",-name=>"content",value=>"analyse"}),
@@ -281,8 +283,9 @@ my $page = shift;
   $tmp =~ s/\.png/GygiRank\.png/;
    if(!-e $tmp)
    {
+	print("GygiRank plot not ready");
    $results_ready = 0;
-   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse\">";
+   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
    }
    $session->param('mascot', 1);
    $session->flush();
@@ -295,7 +298,7 @@ my $page = shift;
    if(!-e $tmp)
    {
    $results_ready = 0;
-   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse\">";
+   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
    }
   $session->param('omssa', 1);
   $session->flush();
@@ -305,25 +308,33 @@ my $page = shift;
   $session->param('omssa', 0);
   $session->flush();
   }
+
+  #DCW - tmp2 taken out of 'if'
+	my $tmp2 = "/var/www/tmp/" . $session->id . "_summary.txt";
+   	if(!-e $tmp2)
+   	{
+		$results_ready = 0;
+   		$refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
+  	}
+
   if($cgi->param("combine") || $session->param("combine") == 1)
   {
-my $tmp = "/var/www/tmp/" . $session->id . "combined_peptides.out";
-my $tmp2 = "/var/www/tmp/" . $session->id . "_summary.txt";
-   if(!-e $tmp || -z $tmp || !-e $tmp2)
-   {
-$results_ready = 0;
-   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse\">";
-
-  }
-
-  $session->param('combine', 1);
-  $session->flush();
+	my $tmp = "/var/www/tmp/" . $session->id . "combined_peptides.out";
+   	if(!-e $tmp || -z $tmp)
+   	{
+		$results_ready = 0;
+   		$refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
+  	}
+  	$session->param('combine', 1);
+  	$session->flush();
   }
   else
   {
-  $session->param('combine', 0);
-  $session->flush();
+  	$session->param('combine', 0);
+  	$session->flush();
   }
+
+
   if($cgi->param("tandem_search_type") =~ m/^[cs]/ || $session->param("tandem") == 1)
   {
   $FDR_image_file[2] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/tandem_fdranalysis_" . $session->id . ".png"; 
@@ -332,7 +343,7 @@ $results_ready = 0;
    if(!-e $tmp)
    {
    $results_ready = 0;
-   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse\">";
+   $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
    }
   $session->param("tandem",1);
   $session->flush();
@@ -349,14 +360,14 @@ $results_ready = 0;
   exit(1);
   }
 
-
   if(!$session->param("paramsset"))
   {
 $session->param("paramsset",1);
 $results_ready = 0;
-  $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse\">";
+  $refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=FDRanalysis_NEW.pl?content=analyse\">";
 
   my $params = "/var/www/tmp/fdranalysis_param_" . $session->id . ".txt";
+
   my $cmd = "rm $params";
   system($cmd);
   ##Mascot
@@ -512,7 +523,7 @@ start_html($refresh_browser);
                $cgi->div({id=>"content"},
                                $cgi->br(),
 			$cgi->p("The analysis is running, please be patient this shouldn't take too long."),
-			$cgi->p("This page will automatically refresh, if it doesn't please click ",$cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse"},"here")),
+			$cgi->p("This page will automatically refresh, if it doesn't please click ",$cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse"},"here")),
  			$cgi->br(),
 			$cgi->img({src=>"http://ispider.smith.man.ac.uk/FDRAnalysis/Waiting.gif"}),
 			$cgi->br(),
@@ -634,7 +645,7 @@ open(FILE,"<$summaryfile") or print "can't open the summary $summaryfile\n";
   my $nterminal = " ";
   if($session->param("nterminal") == 1)
   {
-   $nterminal = qq{<li><a href="http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=nterdist">Nterminal Distribution</a></li>};
+   $nterminal = qq{<li><a href="FDRanalysis_NEW.pl?content=analyse;result_view=nterdist">Nterminal Distribution</a></li>};
    }
 #  #delta
 #   for(my $i=0 ; $i<scalar(@FDR_image_file) ; $i++)
@@ -656,13 +667,13 @@ open(FILE,"<$summaryfile") or print "can't open the summary $summaryfile\n";
                                                 $cgi->Tr( 
 						$cgi->td(
 						 $cgi->ul(
-                                		 $cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=summary"},"Summary")),
-							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=combined"},"Peptide Overlap")),
-$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=rankplot"},"Rank plot")),
+                                		 $cgi->li($cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse;result_view=summary"},"Summary")),
+							$cgi->li($cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse;result_view=combined"},"Peptide Overlap")),
+							$cgi->li($cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse;result_view=rankplot"},"Rank plot")),
                                				 $cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=deltamass"},"Delta Mass")),
-                                			$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=scoredist"},"Score Distribution")),
+                                			$cgi->li($cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse;result_view=scoredist"},"Score Distribution")),
                                 			$nterminal,
-							$cgi->li($cgi->a({href=>"http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDRanalysis_NEW.pl?content=analyse;result_view=zoomscore"},"Correct/Incorrect"))
+							$cgi->li($cgi->a({href=>"FDRanalysis_NEW.pl?content=analyse;result_view=zoomscore"},"Correct/Incorrect"))
 							)
 
 							))))),
@@ -797,6 +808,10 @@ my $search = shift;
  ErrorMsg("Sorry, the file ($file) you have tried to upload is too big.\n");
  exit(1);
  }
+
+	my $exists = -e $file;
+	my $size = -s $file;
+	print("<br>" . $file . ", ".$exists . "," . $size . "<br>");
 
 my $tmp = "/var/www/tmp/" . $search . "_" . $session->id . ".txt";
 open(LOCAL,">$tmp") or die "$!";
@@ -939,8 +954,8 @@ sub services()
 sub RunAnalysis
 {
 my $param_file = shift;
-
-my $cmd = "/var/www/localhost/cgi-bin/FDRAnalysis/TestMascotAllDecoySearchesInOne.pl ";
+my $cmd = "/var/www/localhost/cgi-bin/FDRAnalysis/TestAllDecoySearchesInOne.pl ";
+#my $cmd = "TestAllDecoySearchesInOne.pl ";
 
 my $rev;
 my $for;
@@ -1066,7 +1081,8 @@ open(FILE,"<$param_file") or die "RunAnalysis unable to open the params file $pa
    if($split[1] =~ /on/)
    {
    $oversize =~ s/\n//g;
-   $cmd .= " -z $oversize"; 
+   #$cmd .= " -z $oversize"; 
+   $cmd .= " -D $oversize"; #DCW
    }
   }
   elsif($split[0] =~ m/max\_expect/)
@@ -1093,8 +1109,15 @@ open(FILE,"<$param_file") or die "RunAnalysis unable to open the params file $pa
  }
 close FILE;
 
-$cmd .= "  -s /var/www/tmp/" . $session->id . " ";
+$cmd .= " -s /var/www/tmp/" . $session->id . " ";
 
+$cmd .= " -I"; #DCW - produce images
+#DCW - produces combined search info
+if($cgi->param("combine"))
+{
+	$cmd .= " -z 1";
+}
+#$cmd .= " -k 1"; #DCW - full overlap analysis
 
 #$cmd .= " &"; #this MUST be commented out if using QSUB!!!
 #system($cmd);
@@ -1102,7 +1125,7 @@ $cmd .= "  -s /var/www/tmp/" . $session->id . " ";
 my $shell = "/tmp/RunFDRAnalysis_" . $session->id . ".sh";
 
 open(SHELL,">$shell") or die "unable to create a shell file, $shell\n";
-print SHELL "#!/bin/sh \n";
+print SHELL "#!/bin/sh -w\n";
 print SHELL $cmd;
 print SHELL "\n\n";
 

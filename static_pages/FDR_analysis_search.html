@@ -15,7 +15,7 @@
 
 <div id="main_result">
 <div id="content">
-<form name="fdr_search" action="FDR_analysis_analyse.html", method="post">
+<form name="fdr_search" action="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl?refresh=true" ENCTYPE="multipart/form-data" method="post">
 	<br>
 	<h2>Parameters for the FDR Analysis</h2>
 	<br>
@@ -47,7 +47,13 @@
 			<input type="radio" name="group3" /> Mascot
 			<input type="radio" name="group3" /> OMSSA
 			<input type="radio" name="group3" checked/> X!Tandem
+			<br>
+			<br>
 		</div>
+		<div align=center>
+			<input type=submit value= "Perform Analysis" id='textarea_border'/>
+		</div>
+		<br>
 		<div id="innerboxheader">
 			<p> Parameters for the FDR analysis
 		</div>
@@ -69,18 +75,21 @@
 			<img height ="20" alt="FDR help" src ="help.jpg", onclick ="window.open('help_page.pl?content=FDR','helpwindow','width=450,height=250');">
 			<br>
 			<br>
-			<input type="checkbox" name="combine" id="textarea_border">   Combine results from different search engines
+			<input type="checkbox" name="combine" id="textarea_border" checked>   Combine results from different search engines
 			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  If using an oversized decoy enter size increase here (specific to combined analysis)
 			<br>
 			<br>
+			<input type="hidden" name="refresh" value="true">
 		</div>
 		<div id="innerboxheader">
 			<p> File Info
 		</div>
 		<div id="innerbox" align="left">
 			The information below is optional as it is not needed for the FDR analysis. However, if you want to obtain your results as correct, fully annotated mzident files, please select the appropriate options below.
+			<br>
+			<br>
 			<input type="text" name="missed_cleavages" value="1" id="textarea_border" size="2">   Number of missed cleavages
 			<img height ="20" alt="Missed cleavages help" src ="help.jpg" onclick ="window.open('help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');">
 			<br>
