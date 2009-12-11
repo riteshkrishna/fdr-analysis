@@ -6,7 +6,7 @@
 		<tr>
  			<td> <a href="FDR_analysis_home.html"> <img width="60" height="50" alt="link to home" src="home.jpg"></a>
  			<td> <a href="FDR_analysis_search.html"> <img width="60" height="50" alt="link to search" src="search.jpg"></a>
- 			<td> <a href="FDR_analysis_analyse.html"> <img width="60" height="50" alt="link to analysis" src="analysis.jpg"></a>
+ 			<td> <a href="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl"> <img width="60" height="50" alt="link to analysis" src="analysis.jpg"></a>
  			<td> <a href="FDR_analysis_help.html"> <img width="60" height="50" alt="link to home" src="help.jpg"></a>
  			<td> <a href="mailto:david.wedge@manchester.ac.uk"> <img width="60" height="50" alt="link to home" src="contact.jpg"></a>
 		</tr>
@@ -28,25 +28,39 @@
 			File 1: <input type="file" name="input1" id="textarea_border" size="50"/>
 			<br>
 			File type
-			<input type="radio" name="group1" checked/> Mascot
-			<input type="radio" name="group1" /> OMSSA
-			<input type="radio" name="group1" /> X!Tandem
+			<SELECT NAME="SE1"  id="textarea_border">
+			      <OPTION SELECTED>Mascot</OPTION>
+			      <OPTION>OMSSA</OPTION>
+			      <OPTION>X!Tandem</OPTION>
+			      <OPTION>Mzident</OPTION>
+			</SELECT>
 			<br>
 			<br>
 			File 2: <input type="file" name="input2" id="textarea_border" size="50"/>
 			<br>
 			File type
-			<input type="radio" name="group2" /> Mascot
-			<input type="radio" name="group2" checked/> OMSSA
-			<input type="radio" name="group2" /> X!Tandem
+			<SELECT NAME="SE2"  id="textarea_border">
+			      <OPTION>Mascot</OPTION>
+			      <OPTION SELECTED>OMSSA</OPTION>
+			      <OPTION>X!Tandem</OPTION>
+			      <OPTION>Mzident</OPTION>
+			</SELECT>
 			<br>
 			<br>
 			File 3: <input type="file" name="input3" id="textarea_border" size="50"/>
 			<br>
 			File type
-			<input type="radio" name="group3" /> Mascot
-			<input type="radio" name="group3" /> OMSSA
-			<input type="radio" name="group3" checked/> X!Tandem
+			<SELECT NAME="SE1"  id="textarea_border">
+			      <OPTION>Mascot</OPTION>
+			      <OPTION>OMSSA</OPTION>
+			      <OPTION SELECTED>X!Tandem</OPTION>
+			      <OPTION>Mzident</OPTION>
+			</SELECT>
+			<br>
+			<br>
+			<br>
+			<input type="text" name="rev_tag" value="REV_" id="textarea_border" size="5">   Tag used in Decoy search
+			<img height ="20" alt="Decoy tag help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 		</div>
@@ -62,21 +76,18 @@
 			<br>
 			<br>
 			 <input type="checkbox" name='nter' id="textarea_border">  Include N terminal analysis
-			<img height ="20" alt="N-terminal help" src ="help.jpg"  onclick ="window.open('help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');">
-			<br>
-			<input type="text" name="rev_tag" value="REV_" id="textarea_border" size="5">   Tag used in Decoy search
-			<img height ="20" alt="Decoy tag help" src ="help.jpg" onclick ="window.open('help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');">
+			<img height ="20" alt="N-terminal help" src ="help.jpg"  onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="max_expect" value="0.05" id="textarea_border" size="5">   Maximum expectation value to use for the Rank plot
-			<img height ="20" alt="Expectation value help" src ="help.jpg" onclick ="window.open('help_page.pl?content=expectation_value','helpwindow','width=450,height=250');">
+			<img height ="20" alt="Expectation value help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=expectation_value','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="fdr_value" value="0.05" id="textarea_border" size="5">   FDR rate
 			<input type="hidden" name="analysis_type">
-			<img height ="20" alt="FDR help" src ="help.jpg", onclick ="window.open('help_page.pl?content=FDR','helpwindow','width=450,height=250');">
+			<img height ="20" alt="FDR help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=FDR','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<input type="checkbox" name="combine" id="textarea_border" checked>   Combine results from different search engines
-			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
+			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  If using an oversized decoy enter size increase here (specific to combined analysis)
 			<br>
@@ -90,14 +101,14 @@
 			The information below is optional as it is not needed for the FDR analysis. However, if you want to obtain your results as correct, fully annotated mzident files, please select the appropriate options below.
 			<br>
 			<br>
-			<input type="text" name="missed_cleavages" value="1" id="textarea_border" size="2">   Number of missed cleavages
-			<img height ="20" alt="Missed cleavages help" src ="help.jpg" onclick ="window.open('help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');">
+			<input type="text" name="missed_cleavages" value="1" id="textarea_border" size="2">   Maximum number of missed cleavages
+			<img height ="20" alt="Missed cleavages help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=missed_cleavages','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			Parent mass type:
-			<input type="radio" name="parent_mass_type" checked/> monoisotopic
-			<input type="radio" name="parent_mass_type" /> average
-			<img height ="20" alt="Parent mass type help" src ="help.jpg", onclick ="window.open('help_page.pl?content=parent_mass_type','helpwindow','width=450,height=250');">
+			<input type="radio" name="parent_mass_type" value="monoisotopic" checked/> monoisotopic
+			<input type="radio" name="parent_mass_type" value="average" /> average
+			<img height ="20" alt="Parent mass type help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=parent_mass_type','helpwindow','width=450,height=250');">
 			<br>
 			Parent tolerance ±
 			<input type="text" name="parent_tolerance" value="1.0" id="textarea_border" size="2" align="right">
@@ -108,9 +119,9 @@
 			<br>
 			<br>
 			Fragment mass type:
-			<input type="radio" name="fragment_mass_type" checked/> monoisotopic
-			<input type="radio" name="fragment_mass_type" /> average
-			<img height ="20" alt="Fragment mass type help" src ="help.jpg", onclick ="window.open('help_page.pl?content=fragment_mass_type','helpwindow','width=450,height=250');">
+			<input type="radio" name="fragment_mass_type" value="monoisotopic" checked/> monoisotopic
+			<input type="radio" name="fragment_mass_type" value="average" /> average
+			<img height ="20" alt="Fragment mass type help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=fragment_mass_type','helpwindow','width=450,height=250');">
 			<br>
 			Fragment tolerance ±
 			<input type="text" name="fragment_tolerance" value="1.0" id="textarea_border" size="2" align="right">
@@ -143,7 +154,7 @@
 			      <OPTION>No_cleavage</OPTION>
 			</SELECT>
 			Select enzyme
-			<img height ="20" alt= "Select enzyme help" src ="help.jpg", onclick ="window.open('help_page.pl?content=enzyme','helpwindow','width=450,height=250');">
+			<img height ="20" alt= "Select enzyme help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=select_enzyme','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<SELECT NAME="fixed_mods" MULTIPLE SIZE="5" id="textarea_border">
@@ -212,11 +223,11 @@
 			      <OPTION>TMT6plex (K)</OPTION>
 			      <OPTION>TMT6plex (N-term)</OPTION>
     			</SELECT>
-				Select fixed mods
-				<img height ="20" alt="Select fixed mods help" src ="help.jpg", onclick ="window.open('help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');">
-				<br>
-				<br>
-				<SELECT NAME="variable_mods" MULTIPLE SIZE="5" id="textarea_border">
+			Select fixed mods
+			<img height ="20" alt="Select fixed mods help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');">
+			<br>
+			<br>
+			<SELECT NAME="variable_mods" MULTIPLE SIZE="5" id="textarea_border">
 			      <OPTION>Acetyl (K)</OPTION>
 			      <OPTION>Acetyl (N-term)</OPTION>
 			      <OPTION>Acetyl (Protein N-term)</OPTION>
@@ -283,7 +294,7 @@
 			      <OPTION>TMT6plex (N-term)</OPTION>
     			</SELECT>
 				Select variable mods
-				<img height ="20" alt="Select variable mods help" src ="help.jpg", onclick ="window.open('help_page.pl?content=variable_mods','helpwindow','width=450,height=250');">
+				<img height ="20" alt="Select variable mods help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=variable_mods','helpwindow','width=450,height=250');">
 				<br>
 				<br>
 		</div>

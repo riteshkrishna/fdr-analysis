@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 #####################################################################################################
-#        Copyright (C) 2009, Jennifer Siepen & David Wedge, University of Manchester                              #
+#        Copyright (C) 2009, Jennifer Siepen & David Wedge, University of Manchester                #
 #                                                                                                   #
 #    This program is free software: you can redistribute it and/or modify                           #
 #    it under the terms of the GNU General Public License as published by                           #
@@ -52,11 +52,11 @@ my $session = new CGI::Session(undef, $sid, {Directory=>'/var/www/tmp/'});
 my $cookie = $cgi->cookie(CGISESSID => $session->id );
 print $cgi->header(-cookie => $cookie );
 
-if ($cgi->param("submit_clicked"))
-{
-	$session->clear();
-	$session->flush();
-}
+#if ($cgi->param("submit_clicked"))
+#{
+#	$session->clear();
+#	$session->flush();
+#}
 
 $sid = $session->id();
 
@@ -69,11 +69,21 @@ sub main_content()
 {
 	my $refresh = shift;
 	my $results_ready = 1;
-	#print("refresh:".$refresh);
+	#print("refresh:".$refresh."<br>");
 	my $file1;
 	my $file2;
 	my $file3;
 	my $combine_param;
+
+	#parameters for mzident
+	#my $missed;
+	#my $parent_mass_type;
+	#my $parent_tolerance;
+	#my $fragment_mass_type;
+	#my $fragment_tolerance;
+	#my $enzyme;
+	my @fixed_mods;
+	my @var_mods;
 	if($refresh eq "true")
 	{
 		$file1=$cgi->param("input1");
@@ -81,21 +91,58 @@ sub main_content()
 		$file3=$cgi->param("input3");
 		$combine_param = $cgi->param("combine");
 		$session->param("paramsset",0);
+		$session->param("nterminal", $cgi->param("nter"));
+
+		#$missed=$cgi->param("missed_cleavages");
+		#$enzyme=$cgi->param("enzyme");
+		@fixed_mods = $cgi->param("fixed_mods");
+		@var_mods = $cgi->param("variable_mods");
+
+		$session->param("missed",$cgi->param("missed_cleavages"));
+		$session->param("enzyme",$cgi->param("enzyme"));
+		$session->param("parent_mass_type",$cgi->param("parent_mass_type"));
+		my $tolerance = $cgi->param("parent_tolerance") . " " . $cgi->param("parent_units");
+		$session->param("parent_tolerance", $tolerance);
+		$session->param("fragment_mass_type",$cgi->param("fragment_mass_type"));
+		$tolerance = $cgi->param("fragment_tolerance") . " " . $cgi->param("fragment_units");
+		$session->param("fragment_tolerance",$tolerance);
+
 		$results_ready=0;
 	}
+		#my $tmp = $session->param('missed');
+		#print("missed= $tmp <br>");
+		#$tmp = $session->param('enzyme');
+		#print("enzyme= $tmp <br>");
+		#$tmp = $session->param('parent_mass_type');
+		#print("parent_mass_type= $tmp <br>");
+		#$tmp = $session->param('parent_tolerance');
+		#print("parent_tolerance= $tmp <br>");
+		#$tmp = $session->param('fragment_mass_type');
+		#print("fragment_mass_type= $tmp <br>");
+		#$tmp = $session->param('fragment_tolerance');
+		#print("fragment_tolerance= $tmp <br>");
+		#print("fixed mods:-<br>");
+		#foreach my $mod (@fixed_mods)
+		#{
+   		#	print("fixed_mod = $mod<br>");
+		#}
+		#print("variable mods:-<br>");
+		#foreach my $mod (@var_mods)
+		#{
+   		#	print("var_mod = $mod<br>");
+		#}
 
 	my $refresh_browser;
 	my $true = 0;
 	my @FDR_image_file;
 
-	if($file1 ||($refresh ne "true" && $session->param("mascot") == 1))
+	if($file1 ||($refresh ne "true" && $session->param("se1") == 1))
 	{
 		#print("checking file1");
 
-		$FDR_image_file[0] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/mascot_fdranalysis_" . $session->id . ".png";
+		$FDR_image_file[0] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/se1_fdranalysis_" . $session->id . ".png";
 		if($refresh eq "true")
 		{
-			#$FDR_image_file[0] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/mascot_fdranalysis_" . $session->id . ".png";
 			my $tmp = $FDR_image_file[0];
 			$tmp =~ s/\.png/GygiRank\.png/;
  			if(-e $tmp)
@@ -115,21 +162,20 @@ sub main_content()
 				$refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDR_analysis_static.pl\">";
 			}
 		}
-		$session->param('mascot', 1);
+		$session->param('se1', 1);
 		$session->flush();
 	}
 	else
 	{
-		$session->param('mascot', 0);
+		$session->param('se1', 0);
 		$session->flush();
 	}
 	
-	if($file2 ||($refresh ne "true" && $session->param("omssa") == 1))
+	if($file2 ||($refresh ne "true" && $session->param("se2") == 1))
 	{
-		$FDR_image_file[1] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/omssa_fdranalysis_" . $session->id . ".png";
+		$FDR_image_file[1] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/se2_fdranalysis_" . $session->id . ".png";
 		if($refresh eq "true")
 		{
-			#$FDR_image_file[1] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/omssa_fdranalysis_" . $session->id . ".png";
 			my $tmp = $FDR_image_file[1];
 			$tmp =~ s/\.png/GygiRank\.png/;
  			if(-e $tmp)
@@ -149,21 +195,21 @@ sub main_content()
 				$refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDR_analysis_static.pl\">";
 			}
 		}
-		$session->param('omssa', 1);
+		$session->param('se2', 1);
 		$session->flush();
 	}
 	else
 	{
-		$session->param('omssa', 0);
+		$session->param('se2', 0);
 		$session->flush();
 	}
 	
-	if($file3 || ($refresh ne "true" && $session->param("tandem") == 1))
+	if($file3 || ($refresh ne "true" && $session->param("se3") == 1))
 	{
-		$FDR_image_file[2] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/tandem_fdranalysis_" . $session->id . ".png";
+		$FDR_image_file[2] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/se3_fdranalysis_" . $session->id . ".png";
 		if($refresh eq "true")
 		{
-			#$FDR_image_file[2] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/tandem_fdranalysis_" . $session->id . ".png";
+			#$FDR_image_file[2] = "/var/www/localhost/htdocs/FDRAnalysis/tmp/se3_fdranalysis_" . $session->id . ".png";
 			my $tmp = $FDR_image_file[2];
 			$tmp =~ s/\.png/GygiRank\.png/;
  			if(-e $tmp)
@@ -183,12 +229,12 @@ sub main_content()
 				$refresh_browser = "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"2\;URL=http://www.ispider.manchester.ac.uk/cgi-bin/FDRAnalysis/FDR_analysis_static.pl\">";
 			}
 		}
-		$session->param('tandem', 1);
+		$session->param('se3', 1);
 		$session->flush();
 	}
 	else
 	{
-		$session->param('tandem', 0);
+		$session->param('se3', 0);
 		$session->flush();
 	}
 
@@ -235,7 +281,7 @@ sub main_content()
 		#print "setting params\n";
 
 		#moved to here 091209
-		if(!$session->param("tandem") && !$session->param("omssa") && !$session->param("mascot"))
+		if(!$session->param("se3") && !$session->param("se2") && !$session->param("se1"))
   		{
 			ErrorMsg("You need to run a search before you can view the results.\n");
 			exit(1);
@@ -249,64 +295,55 @@ sub main_content()
 		my $cmd = "rm $params";
 		system($cmd);
 
-		##Mascot
+		##First file
 		if($file1)
 		{
 			#deal with the rev_file
-			#$cgi->param('rev_file', DealWithFileUpload($cgi->param("input1"),"mascot_rev"));
-			my $tmpFile = DealWithFileUpload($cgi->param("input1"),"mascot_rev");#091209
-			#write the Mascot parameters to the param file
+			my $tmpFile = DealWithFileUpload($cgi->param("input1"),"se1_rev");#091209
+			#write the parameters to the param file
 			open(PARAM,">$params") or die "unable to open the file $params to write to\n";
-			#print PARAM "rev_file\t" . $cgi->param("rev_file") . "\n";
-			print PARAM "rev_file\t" . $tmpFile . "\n";#091209
-			print PARAM "mascot_search_type\tconcatenated forward\n";
-			print PARAM "image\t" . $FDR_image_file[0] . "\n";
+			print PARAM "se1_rev_file\t" . $tmpFile . "\n";#091209
+			print PARAM "se1_search_type\tconcatenated forward\n";
+			print PARAM "se1_image\t" . $FDR_image_file[0] . "\n";
 			close PARAM;
 		}
 
-		##Omssa
+		##Second file
 		if($file2)
 		{
 			#deal with the rev_file
-			#$cgi->param('omssa_rev_file', DealWithFileUpload($cgi->param("input2"),"omssa_rev"));
-			my $tmpFile = DealWithFileUpload($cgi->param("input2"),"omssa_rev");#091209
-			#write the Omssa parameters to the param file
+			my $tmpFile = DealWithFileUpload($cgi->param("input2"),"se2_rev");#091209
+			#write the parameters to the param file
 			open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
-			#print PARAM "omssa_rev_file\t" . $cgi->param("omssa_rev_file") . "\n";
-			print PARAM "omssa_rev_file\t" . $tmpFile . "\n";#091209
-			print PARAM "omssa_search_type\tconcatenated forward\n";
-			print PARAM "omssa_image\t" . $FDR_image_file[1] . "\n";
+			print PARAM "se2_rev_file\t" . $tmpFile . "\n";#091209
+			print PARAM "se2_search_type\tconcatenated forward\n";
+			print PARAM "se2_image\t" . $FDR_image_file[1] . "\n";
 			close PARAM;
 		}
 
-		##Tandem
+		##Third file
 		if($file3)
 		{
 			#deal with the rev_file
-			my $tmpFile = DealWithFileUpload($cgi->param("input3"),"tandem_rev");#091209
-			#write the Tandem parameters to the param file
+			my $tmpFile = DealWithFileUpload($cgi->param("input3"),"se3_rev");#091209
+			#write the parameters to the param file
 			open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
-			#print PARAM "tandem_rev_file\t" . $cgi->param("tandem_rev_file") . "\n";
-			print PARAM "tandem_rev_file\t" . $tmpFile . "\n";#091209
-			print PARAM "tandem_search_type\tconcatenated forward\n";
-			print PARAM "tandem_image\t" . $FDR_image_file[2] . "\n";
+			print PARAM "se3_rev_file\t" . $tmpFile . "\n";#091209
+			print PARAM "se3_search_type\tconcatenated forward\n";
+			print PARAM "se3_image\t" . $FDR_image_file[2] . "\n";
 			close PARAM;
 		}		
 		
 		my $tmpParam;#091209
 
-		$session->param("nterminal", $cgi->param("nter"));
+		#$session->param("nterminal", $cgi->param("nter"));
 		open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
-		#print PARAM "analysis_type\t" . $cgi->param("nter") . "\n";
 		print PARAM "analysis_type\t" . $session->param("nterminal") . "\n";#091209
 		close PARAM;
 
-		#$tmpParam=$cgi->param("combine");
 		if($combine_param)
 		{
 			open(PARAM,">>$params") or die "unable to open the file $params to write to\n";
-			#print PARAM "oversize\t" . $cgi->param("oversize") . "\n";
-			#print PARAM "combine\t" . $cgi->param("combine") . "\n";
 			print PARAM "combine\t" . $combine_param . "\n";
 			close PARAM;
 		}
@@ -324,6 +361,27 @@ sub main_content()
 	   	print PARAM "max_expect\t" . $session->param("max_expect") . "\n";
 	   	print PARAM "fdr_value\t" . $session->param("fdr_value") . "\n";
 	   	print PARAM "rev_tag\t" . $session->param("rev_tag") . "\n";
+
+		#parameters for mzident
+		print PARAM "missed_cleavages\t" . $session->param("missed") . "\n";
+		print PARAM "enzyme\t" . $session->param("enzyme") . "\n";
+		print PARAM "parent_mass_type\t" . $session->param("parent_mass_type") . "\n";
+		print PARAM "parent_tolerance\t" . $session->param("parent_tolerance") . "\n";
+		print PARAM "fragment_mass_type\t" . $session->param("fragment_mass_type") . "\n";
+		print PARAM "fragment_tolerance\t" . $session->param("fragment_tolerance") . "\n";
+		my $line = "fixed_mods";
+		foreach my $mod (@fixed_mods)
+		{
+   			$line .= "\t" . $mod;
+		}
+		print PARAM $line . "\n";
+		$line = "variable_mods";
+		foreach my $mod (@var_mods)
+		{
+   			$line .= "\t" . $mod;
+		}
+		print PARAM $line . "\n";
+
 	   	close PARAM;
 
 		if(!$session->param("max_expect"))
@@ -535,8 +593,8 @@ sub backButton()
 			$cgi->br(),
 			$cgi->start_form(-name=>'fdr_search',-action=>"http://www.ispider.manchester.ac.uk/FDRAnalysis/FDR_analysis_search.html", -method=>"post"),
 			$cgi->submit(-value=>"New Analysis", id=>'textarea_border'),
-			$cgi->input({-type=>"hidden", -name=>"submit_clicked"}),
-			$cgi->input({-type=>"hidden", -name=>"result_view"}),
+			#$cgi->input({-type=>"hidden", -name=>"submit_clicked"}),
+			#$cgi->input({-type=>"hidden", -name=>"result_view"}),
 			$cgi->end_form(),
 			$cgi->br()
 		)
@@ -659,12 +717,12 @@ sub RunAnalysis
 
 	my $cmd = "/var/www/localhost/cgi-bin/FDRAnalysis/TestAllDecoySearchesInOne.pl ";
 
-	my $rev;
-	my $for;
-	my $omssa_for;
-	my $omssa_rev;
-	my $tandem_for;
-	my $tandem_rev;
+	my $se1_rev;
+	my $se1_for;
+	my $se2_for;
+	my $se2_rev;
+	my $se3_for;
+	my $se3_rev;
 	my $oversize = 1;
 
 	#get the parameters
@@ -686,89 +744,89 @@ sub RunAnalysis
 				$cmd .= "-q 1 ";
 			}
 		}
-  		#deal with the mascot files
-		elsif($split[0] eq "mascot_search_type")
+  		#deal with the files
+		elsif($split[0] eq "se1_search_type")
 		{
 			if($split[1] =~ m/Mascot\s+decoy/)
 			{
-				$cmd .= "-d $rev ";
+				$cmd .= "-d $se1_rev ";
 			}   
 			elsif($split[1] =~ m/concatenated\s+forward/)
 			{
-				$cmd .= "-c $rev ";
+				$cmd .= "-c $se1_rev ";
 			}
 			elsif($split[1] =~ m/separate\s+forward/)
 			{
-				$cmd .= "-d $rev -f $for ";
+				$cmd .= "-d $se1_rev -f $se1_for ";
 			}
 		}
-		#deal with omssa
-		elsif($split[0] eq "omssa_search_type")
+		#deal with second file
+		elsif($split[0] eq "se2_search_type")
 		{
  			if($split[1] =~ m/concatenated\s+forward/)
 			{
-				$cmd .= " -r $omssa_rev ";
+				$cmd .= " -r $se2_rev ";
 			}
 			elsif($split[1] =~ m/separate\s+forward/)
 			{
-				$cmd .= " -p $omssa_for -i $omssa_rev ";
+				$cmd .= " -p $se2_for -i $se2_rev ";
 			}
 		}
-		#deal with tandem
-		elsif($split[0] eq "tandem_search_type")
+		#deal with third file
+		elsif($split[0] eq "se3_search_type")
 		{
 			if($split[1] =~ m/concatenated\s+forward/)
 			{
-				$cmd .= " -x $tandem_rev ";
+				$cmd .= " -x $se3_rev ";
 			}
 			elsif($split[1] =~ m/separate\s+forward/)
 			{
-				$cmd .= " -u $tandem_for -v $tandem_rev ";
+				$cmd .= " -u $se3_for -v $se3_rev ";
 			}
 		}
-		elsif($split[0] =~ m/^for\_file/)
+		elsif($split[0] =~ m/se1\_for\_file/)
 		{
-			$for = $split[1];
-			$for =~ s/\n//g;
+			$se1_for = $split[1];
+			$se1_for =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/omssa\_for\_file/)
+		elsif($split[0] =~ m/se2\_for\_file/)
 		{
-			$omssa_for = $split[1];
-			$omssa_for =~ s/\n//g;
+			$se2_for = $split[1];
+			$se2_for =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/tandem\_for\_file/)
+		elsif($split[0] =~ m/se3\_for\_file/)
 		{
-			$tandem_for = $split[1];
-			$tandem_for =~ s/\n//g;
+			$se3_for = $split[1];
+			$se3_for =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/^rev\_file/) 
+		elsif($split[0] =~ m/se1\_rev\_file/)
 		{
-			$rev = $split[1];
-			$rev =~ s/\n//g;
+			$se1_rev = $split[1];
+			$se1_rev =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/omssa\_rev\_file/)
+		elsif($split[0] =~ m/se2\_rev\_file/)
 		{
-			$omssa_rev = $split[1];
-			$omssa_rev =~ s/\n//g;
+			$se2_rev = $split[1];
+			$se2_rev =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/tandem\_rev\_file/)
+		elsif($split[0] =~ m/se3\_rev\_file/)
 		{
-			$tandem_rev = $split[1];
-			$tandem_rev =~ s/\n//g;
+			$se3_rev = $split[1];
+			$se3_rev =~ s/\n//g;
 		}
-		elsif($split[0] =~ m/^image/)
+		elsif($split[0] =~ m/se1\_image/)
 		{
 			my $image = $split[1];
 			$image =~ s/\n//g;
 			$cmd .= " -o $image ";
 		}
-		elsif($split[0] =~ m/omssa\_image/)
+		elsif($split[0] =~ m/se2\_image/)
 		{
 			my $image = $split[1];
 			$image =~ s/\n//g;
 			$cmd .= " -j $image ";
 		}
-		elsif($split[0] =~ m/tandem\_image/)
+		elsif($split[0] =~ m/se3\_image/)
 		{
 			my $image = $split[1];
 			$image =~ s/\n//g;
