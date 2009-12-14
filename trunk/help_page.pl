@@ -159,6 +159,13 @@ elsif($subject eq "select_enzyme")
 	h2('Help: select enzyme'),
 	"Enter the enzyme used to digest proteins prior to mass spectrometry.";
 }
+elsif($subject eq "missed_cleavages")
+{
+	print header,
+	start_html('Help: missed cleavages'),
+	h2('Help: missed cleavages'),
+	"Enzymes cleave proteins at specific amino acid residues. Howvever, the cleavage of proteins is often incomplete. Enter a maximum number of missed cleavages allowed in the resultant peptides.";
+}
 elsif($subject eq "fixed_mods")
 {
 	print header,
