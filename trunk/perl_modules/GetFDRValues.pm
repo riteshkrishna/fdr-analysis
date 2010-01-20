@@ -26,19 +26,24 @@ our @EXPORT = qw(GetFDRValues);
 
 use URI::Escape;
 
-use lib qw(~/LIVERPOOL/bin/perl_modules/);
+#use lib qw(/nfs/san_home/mbdssdw6/LIVERPOOL/bin/perl_modules/);
+#use lib qw(~/LIVERPOOL/bin/perl_modules/);
+use lib qw(/var/www/localhost/cgi-bin/FDRAnalysis/perl_modules/);
 use MascotParser;
 
 sub GetFDRValues
 {
 #search type is seperate or concatanated
 my $searchtype = shift;
+#print("initial search type $searchtype");
 my $max_fdr = shift;
 my $fdrtype = shift;
 my $setype = shift;
 my $nterminal = shift;
 my $rev_tag = shift;
 my @results = @_;
+
+print("GetFDRValues starting\n");
 
 my @graph;
 my %fdr_gygi;
@@ -60,15 +65,16 @@ my %expect_peptides;
 
 my $minimum_score = 10000;
 
-
  #for all the peptides
  for(my $s=0 ; $s<scalar(@results) ; $s++)
  {
- my $r = 1;
+  my $r = 1;
   if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL")
   {
-  my $disc = $results[$s][$r]{'expect'};
+   my $disc = $results[$s][$r]{'expect'};
    #get the sum of for and negative hits above this score
+
+   #print("disc=$disc,minimum_score=$minimum_score\n");
 
    if(!$fdr_gygi{$disc} && $disc<$minimum_score)
 #if(!$fdr_gygi{$disc})
@@ -76,12 +82,16 @@ my $minimum_score = 10000;
 
    push(@scorerecord,$disc);
    my @sum = GetSums($disc,'D',$rev_tag,@results);
+
+   #print("$setype,$sum[0],$sum[1]\n");
+
    #forward is sum[0] and reverse sum[1]
    #Gygi
    $fdr = 0; 
    $fdr = ($sum[1])+($sum[0]);
 
-    if($searchtype == "C")
+    if($searchtype eq "C")
+    #if($searchtype == "C")
     {
     $fdr = (2*$sum[1])/$fdr;
     }
@@ -91,38 +101,58 @@ my $minimum_score = 10000;
     }
    $fdr_gygi{$disc} = $fdr;
 
+   #NEW CODE 220709 DCW
+   my $tmp_gygi_fdr = $fdr_gygi{$disc};
+
    #Jones
    $fdr = 0;
    $fdr = $sum[0];
-    if($searchtype == "C")
+    if($searchtype eq "C")
+    #if($searchtype == "C")
     {
-    $fdr = $sum[1]/$fdr;
+     #print("search type C\n");
+     if($fdr)
+     {
+     $fdr = $sum[1]/$fdr;
+     }
+     else
+     {
+     $fdr = 100;
+     }
     }
     else
     {
     $fdr = $fdr+$sum[1];
-    $fdr = $fdr/$sum[1];
+    $fdr = $sum[1]/$fdr;
+    #$fdr = $fdr/$sum[1];
     }
    $fdr_jones{$disc} = $fdr;
 
+   #print("fdr_gygi:$fdr_gygi{$disc},fdr_jones:$fdr_jones{$disc}\n");
+   #print("temp gygi $tmp_gygi_fdr\n");
 
    #which FDR is lower?
+   #DCW 240709 Ignore results for which EITHER fdr value is above $ignore_fdr (usually 0.6)
+   my $ignore_fdr = 0.6;
    if($fdr>$tmp_gygi_fdr)
    {
+    #print("+ $fdr\n");
     if($fdr>=0.6 && $disc<$minimum_score)
     {
     $minimum_score = $disc;
+    #print("$setype new min score: $minimum_score\n");
     }
    }
    else
    {
+    #print("- $fdr\n");
     if($tmp_gygi_fdr>=0.6 && $disc<$minimum_score)
     {
     $minimum_score = $disc;
+    #print("$setype new min score: $minimum_score\n");
     }
-   }
+   } 
   } 
-
 
    if($score_count{$disc} && !$gygi_obs{$results[$s][$r]{'sequence'}})
    {
@@ -137,7 +167,7 @@ my $minimum_score = 10000;
     $nter_count{$disc} = 1;
     }
    }
-   #otherwise we have seen the sequence before but with sa worse score
+   #otherwise we have seen the sequence before but with a worse score
    elsif($score_count{$disc} && $disc<$gygi_obs{$results[$s][$r]{'sequence'}})
    {
 
@@ -189,6 +219,7 @@ my $minimum_score = 10000;
   }
  }
 
+print("GetFDRValues counting\n");
 
 my %counter;
 my %ntercounter;
@@ -211,23 +242,37 @@ my $max_05 = 0;
     }
    }
   }
- 
+
+#DCW - return max_05 value (used for thresholding)
+$res{$max_fdr}[6] = $max_05;
+
+print("GetFDRValues getting peptides\n");
 
 #get the peptides
 my %pep;
+
+#DCW TMP not used in web version (??)
+#open(TMP,">>/fs/san/home/mbdssdw6/THISISTMP_frommod.txt") or die "unable to open TMP file\n";
+
  for(my $s=0 ; $s<scalar(@results) ; $s++)
  {
  my $r = 1;
-  if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL" && $results[$s][$r]{'expect'}<=$max_05)
+  #if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL" && $results[$s][$r]{'expect'}<=$max_05)
+  if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL" && $results[$s][$r]{'expect'}<=$max_05+0.000001)#DCW
   {
+
+#print TMP "$results[$s][$r]{'sequence'}\t$results[$s][$r]{'protein'}\n";
+
   $pep{$max_fdr} .= "$results[$s][$r]{'protein'}\#\#\#$results[$s][$r]{'sequence'}\#\#\#$results[$s][$r]{'start'}\#\#\#$results[$s][$r]{'ionscore'}\#\#\#$results[$s][$r]{'expect'}\*\*\*";
   }
  } 
-
+#close TMP;
  my %res;
  #for all the fdr scores
  foreach my $fdr (keys %counter)
  {
+ #print("gygi $fdr $counter{$fdr} , $ntercounter{$fdr}\n");
+
  $res{$fdr}[0] = $counter{$fdr};
  $res{$fdr}[1] = $ntercounter{$fdr};
  $res{$fdr}[4] = $pep{$fdr};
@@ -255,6 +300,8 @@ my $max_05 = 0;
    }
   }
 
+#DCW - return max_05 value (used for thresholding)
+$res{$max_fdr}[7] = $max_05;
 
 #my %pep;
  for(my $s=0 ; $s<scalar(@results) ; $s++)
@@ -262,13 +309,15 @@ my $max_05 = 0;
  my $r = 1;
   if($results[$s][$r]{'sequence'} && $results[$s][$r]{'sequence'} ne "NULL" && $results[$s][$r]{'expect'}<=$max_05)
   {
+
   $pep{$max_fdr} .= "$results[$s][$r]{'protein'}\#\#\#$results[$s][$r]{'sequence'}\#\#\#$results[$s][$r]{'start'}\#\#\#$results[$s][$r]{'ionscore'}\#\#\#$results[$s][$r]{'expect'}\*\*\*";
   }
  }
 
-
  foreach my $fdr (keys %counter)
  {
+ #print("jones $fdr , $counter{$fdr} , $ntercounter{$fdr}\n");
+
  $res{$fdr}[2] = $counter{$fdr};
  $res{$fdr}[3] = $ntercounter{$fdr};
  $res{$fdr}[5] = $pep{$fdr};

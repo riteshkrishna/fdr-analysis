@@ -2,7 +2,7 @@ package GetDiscriminantScorePlot;
 require Exporter;
 
 #####################################################################################################
-#        Copyright (C) 2009, Jennifer Siepen, University of Manchester                              #
+#        Copyright (C) 2009, Jennifer Siepen and David Wedge, University of Manchester              #
 #                                                                                                   #
 #    This program is free software: you can redistribute it and/or modify                           #
 #    it under the terms of the GNU General Public License as published by                           #
@@ -28,205 +28,218 @@ our @EXPORT = qw(GetScoreDistribution);
 use strict;
 use URI::Escape;
 
-use lib qw(~/LIVERPOOL/bin/perl_modules/);
+#use lib "/var/www/localhost/cgi-bin/FDRAnalysis/perl_modules/";
 use strict;
-use MascotParser;
 use CreatePNG;
 
 
 sub GetScoreDistribution
 {
-my $imagefile = shift;
-my $scoretype = shift;
-my $setype = shift;
-my $REVTAG = shift;
-my @results = @_;
+	my $imagefile = shift;
+	my $scoretype = shift;
+	my $setype = shift;
+	my $REVTAG = shift;
+	my @results = @_;
 
-my @graph;
-my %distribution;
-my $min=1;
-my $max = 0;
-my @scoresorter;
+	my @graph;
+	my %distribution;
+	#my $min=1;
+	my $min=1000;
+	my $max = 0;
+	my @scoresorter;
 
-my $engine;
- if($setype eq "M")
- {
- $engine = "Mascot";
- }
- elsif($setype eq "O")
- {
- $engine = "Omssa";
- }
- elsif($setype eq "T")
- {
- $engine = "XTandem";
- }
+	my $engine;
+	if($setype eq "M")
+	{
+		$engine = "Mascot";
+	}
+	elsif($setype eq "O")
+	{
+		$engine = "Omssa";
+	}
+	elsif($setype eq "T")
+	{
+		$engine = "XTandem";
+	}
 
+	for(my $r=1 ; $r<scalar(@results) ; $r++)
+	{
+ 		#sometimes mascot doesn't cover all sequence
+		if($results[$r][1]{'sequence'} && $results[$r][1]{'sequence'} ne "NULL")
+		{
+			#only rank 1
+			for(my $rank=1 ; $rank<2 ; $rank++)
+			{
+				#get the identity score
+				my $score = $results[$r][$rank]{'ionscore'};
+				my $disc;
 
- for(my $r=1 ; $r<scalar(@results) ; $r++)
- {
-  #sometimes mascot doesn't cover all sequence
+				#discriminant score required?
+				if($scoretype eq "D")
+				{
+					my $identity = GetIdentity($results[$r][$rank]{'qmatch'});
+					$disc = $score - $identity;
+				}
+				else
+				{
+					$disc = $score;
+				}
 
-  if($results[$r][1]{'sequence'} && $results[$r][1]{'sequence'} ne "NULL")
-  {
-   #only rank 1
-   for(my $rank=1 ; $rank<2 ; $rank++)
-   {
-   #get the identity score
-   my $score = $results[$r][$rank]{'ionscore'};
-   my $disc;
+				if($setype ne "O")
+				{
+					#$disc = int($disc);
+				}
+				else
+				{
+					#DCW - 211209
+					$disc = $results[$r][$rank]{'expect'};
+					$disc = -log($disc);
 
-   #discriminant score required?
-    if($scoretype eq "D")
-    {
-    my $identity = GetIdentity($results[$r][$rank]{'qmatch'});
-    $disc = $score - $identity;
-    }
-    else
-    {
-    $disc = $score;
-    }
+				}
 
-   if($setype ne "O")
-   {
-   $disc = int($disc);
-   }
-   else
-   {
-   $disc = log($disc);
-   $disc = sprintf("%.1f",$disc);
-   } 
+				#DCW 190110 - convert to integer value, allowing for negative numbers
+				if($disc<0)
+				{
+					$disc=-int(-$disc-0.000001)-1;
+				}
+				else
+				{
+					$disc=int($disc);
+				}
 
-    if($disc>$max)
-    {
-    $max = $disc;
-    }
+				if($disc>$max)
+				{
+					$max = $disc;
+				}
+				#DCW
+				if($disc<$min)
+				{
+					$min = $disc;
+				}
 
-   my $rev = 0;
-    if($results[$r][$rank]{'protein'} =~ m/$REVTAG/)
-    {
-    $rev = 1;
-    }   
+				my $rev = 0;
 
-   
+				if($results[$r][$rank]{'protein'} =~ m/$REVTAG/)
+				{
+					$rev = 1;
+				}   
 
-    if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<1000)
-    {
-    $distribution{$disc}[$rev]++;
-    }
-    elsif(!$distribution{$disc}[$rev])
-    {
-    $distribution{$disc}[$rev] = 1;
-    } 
+				if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<1000)
+				{
+					$distribution{$disc}[$rev]++;
+				}
+				elsif(!$distribution{$disc}[$rev])
+				{
+					$distribution{$disc}[$rev] = 1;
+				} 
+			}
+		}
+	}
 
-   }
-  }
- }
+	print("discriminant score plot: max=".$max.", min=".$min."\n");
 
-my @plotdata;
-my $count = 0;
- foreach my $score (keys %distribution)
- {
-push(@scoresorter,$score);
-  $plotdata[0][$count] = $score;
-   if($distribution{$score}[0])
-   {
-   $plotdata[1][$count] = $distribution{$score}[0];
-   }
-   if($distribution{$score}[1])
-   {
-   $plotdata[2][$count] = $distribution{$score}[1];
+	#DCW 190110 - floor/ceil no nearest $labelInterval
+	my $labelInterval = 5;
+	if($min<0)
+	{
+		$min = -(int((-$min-0.000001)/$labelInterval)+1)*$labelInterval;
+	}
+	else
+	{
+		$min = (int(($min-0.000001)/$labelInterval)+1)*$labelInterval;
+	}
+	if($max<0)
+	{
+		$max = -(int((-$max-0.000001)/$labelInterval)+1)*$labelInterval;
+	}
+	else
+	{
+		$max = (int(($max-0.000001)/$labelInterval)+1)*$labelInterval;
+	}
 
-   }
-  #print "\n"; 
-  $count++;
- }
+	my @plotdata;
+	#DCW 190110
+	for(my $i=$min;$i<=$max;$i++)
+	{
+		if($i % $labelInterval == 0)
+		{
+		  	$plotdata[0][$i-$min] = $i;
+		}
+		else
+		{
+			$plotdata[0][$i-$min] = '';
+		}
+	}
 
+	my @totals;
+	foreach my $score (keys %distribution)
+	{
+		if($distribution{$score}[0])
+		{
+			$totals[0] += $distribution{$score}[0];
+		}
+		if($distribution{$score}[1])
+		{
+			$totals[1] += $distribution{$score}[1];
+		}
+	}
 
-#my @sorted = sort { $a <=> $b } @{$plotdata[0]};
-my @sorted = sort {$a <=> $b} (@scoresorter);
+	#DCW 190110
+	foreach my $score (keys %distribution)
+	{
+		if($distribution{$score}[0])
+			{
+			#$plotdata[1][$score-$min] = $distribution{$score}[0];
+			$plotdata[1][$score-$min] = $distribution{$score}[0]/$totals[0]*100;#convert to %
+		}
+		if($distribution{$score}[1])
+		{
+			#$plotdata[2][$score-$min] = $distribution{$score}[1];
+			$plotdata[2][$score-$min] = $distribution{$score}[1]/$totals[1]*100;#convert to %
+		}
+	}
 
-my @sorted_plot_data;
-my $count = 0;
- for(my $s=0 ; $s<scalar(@sorted) ; $s++)
- {
-  if($sorted[$s-1] && $sorted[$s-1] != $sorted[$s])
-  {
- $sorted_plot_data[0][$count] = $sorted[$s];
- $sorted_plot_data[1][$count] = $distribution{$sorted[$s]}[0];
- $sorted_plot_data[2][$count] = $distribution{$sorted[$s]}[1];;
+	if($setype ne "O")
+	{
+		$scoretype .= " score";
+	}
+	else
+	{
+		$scoretype = "-log(expect)";
+	}
+	my $title = $engine . " Score Distribution";
 
-print "sorted_plot_data[0][$count] = $sorted[$s]\n";
-print "sorted_plot_data[1][$count] = $distribution{$sorted[$s]}[0]\n";
-print "sorted_plot_data[2][$count] = $distribution{$sorted[$s]}[1]\n\n";
- $count++;
- }
-}
-  if($setype ne "O")
-  {
-  $scoretype .= " score";
-  }
-  else
-  {
-  $scoretype = "log(expect)";
-  }
- my $title = $engine . " Score Distribution";
-my $image = GetPNGBars($title,$scoretype,'number spectra',$min,$max,@sorted_plot_data);
+	#my $image = GetPNGBars($title,$scoretype,'number spectra',$min,$max,@sorted_plot_data);
+	#my $image = GetPNGBars($title,$scoretype,'number spectra',0,$max,@sorted_plot_data);
+	#my $image = GetPNGBars($title,$scoretype,'% of spectra',$min,$max,@plotdata);#DCW - data are already sorted
+	my $image = GetPNGBars($title,$scoretype,'% of spectra',0,$max,@plotdata);#DCW - min value messes up graph
 
- my $mainimage = new GD::Image((450), (300));
- my $white = $mainimage->colorAllocate(255,255,255);
+	my $mainimage = new GD::Image((450), (300));
+	my $white = $mainimage->colorAllocate(255,255,255);
 
- $mainimage->copy($image,0,0,0,0,450,300);
- open (CHART, ">$imagefile") or print "unable to open the $imagefile file ";
- print CHART $mainimage->png;
- close CHART;
-return 1;
-
+	$mainimage->copy($image,0,0,0,0,450,300);
+	open (CHART, ">$imagefile") or print "unable to open the $imagefile file ";
+	print CHART $mainimage->png;
+	close CHART;
+	return 1;
 } 
 
-
-
 return 1;
 
-
- 
-sub GetDbPath
-{
-my $file = shift;
-my $db;
-open(FILE,"<$file") or die "unable to open the mascot results, $file\n";
- while(my $line = <FILE>)
- {
-  if($line =~ m /^fastafile\=/)
-  {
-  my @split = split/\=/,$line;
-  $db = $split[1];
-  close FILE;
-  }  
- }
-close FILE;
-
-$db =~ s/\/usr\/local\/mascot\//\/fs\/msct\//;
-
-
-return $db;
-
-}
-
+#DCW -not sure what this is for
 sub GetIdentity
 {
-my $qmatch = shift;
-my $id = 0;
+	my $qmatch = shift;
+	my $id = 0;
 
- if($qmatch<1)
- {
- $id = -10.0 * log(1.0/10.0)/log(10);
- }
- else
- {
- $id = -10 * log(1.0/(1.0*$qmatch))/log(10);
- }
+	if($qmatch<1)
+	{
+		$id = -10.0 * log(1.0/10.0)/log(10);
+	}
+	else
+	{
+		$id = -10 * log(1.0/(1.0*$qmatch))/log(10);
+	}
 
-return $id;
-
+	return $id;
 }

@@ -2,7 +2,7 @@ package CreatePNG;
 require Exporter;
 
 #####################################################################################################
-#        Copyright (C) 2009, Jennifer Siepen, University of Manchester                              #
+#        Copyright (C) 2009, Jennifer Siepen and David Wedge, University of Manchester              #
 #                                                                                                   #
 #    This program is free software: you can redistribute it and/or modify                           #
 #    it under the terms of the GNU General Public License as published by                           #
@@ -31,365 +31,372 @@ use GD::Graph::bars;
 use GD::Graph::points;
 use GD;
 
-use lib qw(~/LIVERPOOL/bin/perl_modules/);
+#use lib qw(~/LIVERPOOL/bin/perl_modules/);
 use strict;
 
 my $width="450";
 my $height="300";
 my $fontpath = "/usr/share/fonts/truetype/comic.ttf";
 my $x_max;
-
+my $x_min;#DCW 150110
 
 sub GetPNGVenn
 {
-my $imagefile = shift;
-my @res = @_;
+	my $imagefile = shift;
+	my @res = @_;
 
-#labels are
-#res[0][1] label 1
-#res[0][2] label 2
-#res[0][3] label 3
+	#labels are
+	#res[0][1] label 1
+	#res[0][2] label 2
+	#res[0][3] label 3
 
-#Note the numbers to go in the venn diagram are as follows
-#res[1][0] = number category 1
-#res[2][0] = number category 2
-#res[3][0] = number category 3
-#res[0][0] = number category 1,2 & 3
-#res[1][2] = number category 1 & 2
-#res[1][3] = number category 1 & 3
-#res[2][3] = number category 2 & 3
+	#Note the numbers to go in the venn diagram are as follows
+	#res[1][0] = number category 1
+	#res[2][0] = number category 2
+	#res[3][0] = number category 3
+	#res[0][0] = number category 1,2 & 3
+	#res[1][2] = number category 1 & 2
+	#res[1][3] = number category 1 & 3
+	#res[2][3] = number category 2 & 3
 
 
-my $im = new GD::Image(100,100);
+	my $im = new GD::Image(100,100);
 
-# allocate some colors
-my $white = $im->colorAllocate(255,255,255);
-my $black = $im->colorAllocate(0,0,0);
+	# allocate some colors
+	my $white = $im->colorAllocate(255,255,255);
+	my $black = $im->colorAllocate(0,0,0);
 
-# make the background transparent and interlaced
-$im->transparent($white);
-$im->interlaced('true');
+	# make the background transparent and interlaced
+	$im->transparent($white);
+	$im->interlaced('true');
 
-my $mainimage = new GD::Image((450), (300));
-my $white = $mainimage->colorAllocate(255,255,255);
+	my $mainimage = new GD::Image((450), (300));
+	my $white = $mainimage->colorAllocate(255,255,255);
 
-# Draw the first circle
-$im->arc(50,50,100,100,0,360,$black);
-$im->fill(50,50,$white);
-$mainimage->copy($im,50,50,0,0,100,100);
-$mainimage->string(gdSmallFont,10,25,$res[0][1],$black);
+	# Draw the first circle
+	$im->arc(50,50,100,100,0,360,$black);
+	$im->fill(50,50,$white);
+	$mainimage->copy($im,50,50,0,0,100,100);
+	$mainimage->string(gdSmallFont,10,25,$res[0][1],$black);
 
-#draw the second circle
- if($res[0][2])
- {
- $im->arc(50,50,100,100,0,360,$black);
- $mainimage->copy($im,100,50,0,0,100,100);
- $mainimage->string(gdSmallFont,200,25,$res[0][2],$black);
- }
+	#draw the second circle
+	if($res[0][2])
+	{
+		$im->arc(50,50,100,100,0,360,$black);
+		$mainimage->copy($im,100,50,0,0,100,100);
+		$mainimage->string(gdSmallFont,200,25,$res[0][2],$black);
+	}
 
-##draw the third
- if($res[0][3])
- {
- $im->arc(50,50,100,100,0,360,$black);
- $mainimage->copy($im,75,100,0,0,100,100);
- $mainimage->string(gdSmallFont,110,225,$res[0][3],$black);
- }
+	##draw the third
+	if($res[0][3])
+	{
+		$im->arc(50,50,100,100,0,360,$black);
+		$mainimage->copy($im,75,100,0,0,100,100);
+		$mainimage->string(gdSmallFont,110,225,$res[0][3],$black);
+	}
 
-#and now for the values
- if($res[1][0])
- {
- $mainimage->string(gdSmallFont,75,75,$res[1][0],$black);
- }
- if($res[1][2])
- {
- $mainimage->string(gdSmallFont,115,75,$res[1][2],$black);
- }
- if($res[2][0])
- {
- $mainimage->string(gdSmallFont,165,75,$res[2][0],$black);
- }
- if($res[1][3])
- {
- $mainimage->string(gdSmallFont,90,125,$res[1][3],$black);
- }
- if($res[0][0]) 
- {
- $mainimage->string(gdSmallFont,110,110,$res[0][0],$black);
- }
- if($res[2][3])
- {
- $mainimage->string(gdSmallFont,150,125,$res[2][3],$black);
- }
- if($res[3][0])
- {
- $mainimage->string(gdSmallFont,125,160,$res[3][0],$black);
- }
+	#and now for the values
+	if($res[1][0])
+	{
+		$mainimage->string(gdSmallFont,75,75,$res[1][0],$black);
+	}
+	if($res[1][2])
+	{
+		$mainimage->string(gdSmallFont,115,75,$res[1][2],$black);
+	}
+	if($res[2][0])
+	{
+		$mainimage->string(gdSmallFont,165,75,$res[2][0],$black);
+	}
+	if($res[1][3])
+	{
+		$mainimage->string(gdSmallFont,90,125,$res[1][3],$black);
+	}
+	if($res[0][0]) 
+	{
+		$mainimage->string(gdSmallFont,110,110,$res[0][0],$black);
+	}
+	if($res[2][3])
+	{
+		$mainimage->string(gdSmallFont,150,125,$res[2][3],$black);
+	}
+	if($res[3][0])
+	{
+		$mainimage->string(gdSmallFont,125,160,$res[3][0],$black);
+	}
 
- #leftovers
- if($res[3][3])
- {
- $mainimage->string(gdSmallFont,150,160,$res[3][3],$black);
- }
+	#leftovers
+	if($res[3][3])
+	{
+		$mainimage->string(gdSmallFont,150,160,$res[3][3],$black);
+	}
 
-open (CHART, ">$imagefile") or return 0;
-print CHART $mainimage->png;
-close CHART;
+	open (CHART, ">$imagefile") or return 0;
+	print CHART $mainimage->png;
+	close CHART;
 
-return 1;
+	return 1;
 }
 
 sub GetPNGBars
 {
 
-my $chartname = shift;
-my $xlabel = shift;
-my $ylabel = shift;
-my $setaxis = shift;
-$x_max = shift;
-$x_max = $x_max + ($x_max/100*10);
-my @data = @_;
+	my $chartname = shift;
+	my $xlabel = shift;
+	my $ylabel = shift;
+	#my $setaxis = shift;
+	$x_min = shift;
+	$x_max = shift;
+	#$x_max = $x_max + ($x_max/100*10);#DCW commented out 180110, no longer required, due to margins
+	my @data = @_;
 
 
-my $myimage;
-my $mygraph;
- #plot the values
- $mygraph = GD::Graph::bars->new($width, $height);
+	my $myimage;
+	my $mygraph;
+	#plot the values
+	$mygraph = GD::Graph::bars->new($width, $height);
 
 
-  $mygraph->set(
+	$mygraph->set(
                x_label     => $xlabel,
                y_label     => $ylabel,
                title       => $chartname,
+               x_min_value=>$x_min,
                x_max_value=>$x_max,
-               bar_spacing=>1, 
+               bar_spacing=>1
                ) or warn $mygraph->error;
 
+	$mygraph = SetConstants($mygraph);
 
-$mygraph = SetConstants($mygraph);
-
-if($setaxis)
-{
-$mygraph->set(x_tick_number=>'10');
-} 
-
+	#if($setaxis)
+	#{
+		#$mygraph->set(x_tick_number=>'10');
+		#$mygraph->set(x_tick_number=>$setaxis);#DCW - set number of ticks - commented out: never setaxis
+	#} 
 
 
-   $mygraph->set_legend('Forward', 'Reverse');
-   $myimage = $mygraph->plot(\@data) or die $mygraph->error;
-return $myimage;
+
+	$mygraph->set_legend('Forward', 'Reverse');
+	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
+
+	print("PNG bars finishing\n");
+
+	return $myimage;
 }
 
 
 sub GetPNGLines
 {
-my $chartname = shift;
-my $xlabel = shift;
-my $ylabel = shift;
-my $setaxis = shift;
-$x_max = shift;
-$x_max = $x_max + ($x_max/100*10);
-my $type = shift;
-my @data = @_;
+	my $chartname = shift;
+	my $xlabel = shift;
+	my $ylabel = shift;
+	my $setaxis = shift;
+	$x_min = shift;#DCW
+	$x_max = shift;
+	#$x_max = $x_max + ($x_max/100*10);#DCW commented out 180110, no longer required, due to margins
+	my $type = shift;
+	my @data = @_;
+
+	my $myimage;
+	my $mygraph;
+
+	$mygraph = GD::Graph::lines->new($width, $height);
 
 
-my $myimage;
-my $mygraph;
-
-$mygraph = GD::Graph::lines->new($width, $height);
-
-
-  $mygraph->set(
+	$mygraph->set(
                x_label     => $xlabel,
                y_label     => $ylabel,
+               x_min_value => $x_min,
                x_max_value => $x_max,
                title       => $chartname,
                line_types  => [1, 2],
-               line_width  => 1,
+               line_width  => 1
                ) or warn $mygraph->error;
                
-$mygraph = SetConstants($mygraph);
+	$mygraph = SetConstants($mygraph);
 
-if($setaxis)
-{
-$mygraph->set(x_tick_number=>'10');
-}
+	if($setaxis)
+	{
+		#$mygraph->set(x_tick_number=>'10');
+		$mygraph->set(x_tick_number=>$setaxis);#DCW
+	}
 
- if($type eq "EC")
- {
- $mygraph->set_legend('estimated correct', 'estimated incorrect');
- $mygraph->set(y_label=> $ylabel);
- }
- elsif($type eq "FDR")
- {
- $mygraph->set(two_axes=>1);
- $mygraph->set(y1_label=> $ylabel);
- $mygraph->set(y2_label=> "spectra count");
- $mygraph->set_legend('FDR', 'forward spectra count');
- }
+	if($type eq "EC")
+	{
+		$mygraph->set_legend('estimated correct', 'estimated incorrect');
+		$mygraph->set(y_label=> $ylabel);
+	}
+	elsif($type eq "FDR")
+	{
+		$mygraph->set(two_axes=>1);
+		$mygraph->set(y1_label=> $ylabel);
+		$mygraph->set(y2_label=> "spectra count");
+		$mygraph->set_legend('FDR', 'forward spectra count');
+	}
 
+	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
 
-   $myimage = $mygraph->plot(\@data) or die $mygraph->error;
-
-return $myimage;
-
-
+	return $myimage;
 }
 
 
 sub GetPNGPoints
 {
-my $chartname = shift;
-my $xlabel = shift;
-my $ylabel = shift;
-my $setaxis = shift;
-$x_max = shift;
-$x_max = $x_max + ($x_max/100*10);
-my @data = @_;
+	my $chartname = shift;
+	my $xlabel = shift;
+	my $ylabel = shift;
+	my $setaxis = shift;
+	$x_min = shift;#DCW - 150110
+	$x_max = shift;
+	#$x_max = $x_max + ($x_max/100*10);#DCW commented out 180110, no longer required, due to margins
+	my @data = @_;
 
+	my $myimage;
+	my $mygraph;
 
-my $myimage;
-my $mygraph;
-
-$mygraph = GD::Graph::points->new($width, $height);
-  $mygraph->set(
+	$mygraph = GD::Graph::points->new($width, $height);
+	$mygraph->set(
                x_label     => $xlabel,
                y_label     => $ylabel,
                title       => $chartname,
                markers  => [3, 4],
                marker_size  => 2,
                x_max_value => $x_max,
+               x_min_value => $x_min #DCW 150110
                ) or warn $mygraph->error;
 
-if($setaxis)
-{
-$mygraph->set(x_tick_number=>'10');
+	#DCW commented out - not necessary (because set in SetConstants)
+	#$mygraph->set( 'x_number_format' => \&x_format );
+	#$mygraph->set( 'x_number_format' => "%.2f" );
+
+	if($setaxis)
+	{
+		#$mygraph->set(x_tick_number=>'10');
+		$mygraph->set(x_tick_number=>$setaxis);#DCW - set number of xlabels
+	}
+
+
+	$mygraph = SetConstants($mygraph);
+	$mygraph->set_legend('forward', 'reverse');
+	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
+
+	return $myimage;
 }
-
-
-$mygraph = SetConstants($mygraph);
-$mygraph->set_legend('forward', 'reverse');
-$myimage = $mygraph->plot(\@data) or die $mygraph->error;
-
-return $myimage;
-
-
-}
-
-
 
 return 1;
 
 sub SetConstants
 {
-my $mygraph = shift;
+	my $mygraph = shift;
 
-#font
-$mygraph->set_title_font($fontpath,12);
-$mygraph->set_y_axis_font($fontpath,10);
-$mygraph->set_y_label_font($fontpath,12);
-$mygraph->set_x_axis_font($fontpath,10);
-$mygraph->set_x_label_font($fontpath,12);
-$mygraph->set_legend_font($fontpath,12);
+	#font
+	$mygraph->set_title_font($fontpath,12);
+	$mygraph->set_y_axis_font($fontpath,10);
+	$mygraph->set_y_label_font($fontpath,12);
+	$mygraph->set_x_axis_font($fontpath,10);
+	$mygraph->set_x_label_font($fontpath,12);
+	$mygraph->set_legend_font($fontpath,12);
 
-#legend 
-$mygraph->set(legend_placement=>'CB');
+	#legend 
+	$mygraph->set(legend_placement=>'CB');
 
-#x axis
-$mygraph->set(x_label_position=>0.5);
-$mygraph->set(zero_axis_only=>1);
+	#x axis
+	$mygraph->set(x_label_position=>0.5);
+	$mygraph->set(zero_axis_only=>1);
+	$mygraph->set( 'x_number_format' => \&x_format );
 
-#y axis
-$mygraph->set( 'x_number_format' => \&x_format );
+	#DCW - set margins, to ensure that all axis labels are visible
+	$mygraph->set(r_margin=>5);
+	$mygraph->set(l_margin=>5);
+	$mygraph->set(t_margin=>5);
+	$mygraph->set(b_margin=>5);
+
+	#dataset colours
+	$mygraph->set(dclrs=>['#336633', '#888888', 'cyan','green']);
 
 
-#dataset colours
-$mygraph->set(dclrs=>['#336633', '#888888', 'cyan','green']);
-
-
-return $mygraph;
+	return $mygraph;
 }
 
+#NOTE: DCW - we should let the user set the format rather than using a fixed format
 sub x_format
 {
-my $value = shift;
-my $ret;
-if($x_max>5)
-{ 
-$ret = int($value);
+	my $value = shift;
+	my $ret;
+	if($x_max>5)
+	{ 
+		$ret = int($value);
+	}
+	else
+	{ 
+		$ret = sprintf("%.1f", $value);
+	}
+	return $ret;
 }
-else
-{ 
-$ret = sprintf("%.1f", $value);
-}
-return $ret;
-}
-
 
 sub GetFinalPNG
 {
 
-my $chartname = shift;
-my @myimage = @_;
+	my $chartname = shift;
+	my @myimage = @_;
 
-my $space = 10;
+	my $space = 10;
 
-my $mainimage = new GD::Image(((2*$width)+(4*$space)), ((4*$height)+(5*$space)));
-my $white = $mainimage->colorAllocate(255,255,255);
+	my $mainimage = new GD::Image(((2*$width)+(4*$space)), ((4*$height)+(5*$space)));
+	my $white = $mainimage->colorAllocate(255,255,255);
 
 
-#A1
-$mainimage->copy($myimage[0],$space,$space,0,0,$width,$height);
-#B1
-$mainimage->copy($myimage[1],($width+(2*$space)),$space,0,0,$width,$height);
-#A2
-$mainimage->copy($myimage[2],$space,($height+(2*$space)),0,0,$width,$height);
-#B2
-$mainimage->copy($myimage[3],($width+(2*$space)),($height+(2*$space)),0,0,$width,$height);
-#A3
-$mainimage->copy($myimage[4],$space,((2*$height)+(3*$space)),0,0,$width,$height);
-#B3
-$mainimage->copy($myimage[5],($width+(2*$space)),((2*$height)+(3*$space)),0,0,$width,$height);
-#A4
-#$mainimage->copy($myimage[6],$space,((3*$height)+(4*$space)),0,0,$width,$height);
+	#A1
+	$mainimage->copy($myimage[0],$space,$space,0,0,$width,$height);
+	#B1
+	$mainimage->copy($myimage[1],($width+(2*$space)),$space,0,0,$width,$height);
+	#A2
+	$mainimage->copy($myimage[2],$space,($height+(2*$space)),0,0,$width,$height);
+	#B2
+	$mainimage->copy($myimage[3],($width+(2*$space)),($height+(2*$space)),0,0,$width,$height);
+	#A3
+	$mainimage->copy($myimage[4],$space,((2*$height)+(3*$space)),0,0,$width,$height);
+	#B3
+	$mainimage->copy($myimage[5],($width+(2*$space)),((2*$height)+(3*$space)),0,0,$width,$height);
+	#A4
+	#$mainimage->copy($myimage[6],$space,((3*$height)+(4*$space)),0,0,$width,$height);
 
-open (CHART, ">$chartname") or print "unable to open the $chartname file ";
-print CHART $mainimage->png;
-close CHART;
-
+	open (CHART, ">$chartname") or print "unable to open the $chartname file ";
+	print CHART $mainimage->png;
+	close CHART;
 }
 
 
 sub GetFinalPNGNter
 {
 
-my $chartname = shift;
-my @myimage = @_;
+	my $chartname = shift;
+	my @myimage = @_;
 
-my $space = 10;
+	my $space = 10;
 
-my $mainimage = new GD::Image(((2*$width)+(4*$space)), ((4*$height)+(5*$space)));
-my $white = $mainimage->colorAllocate(255,255,255);
+	my $mainimage = new GD::Image(((2*$width)+(4*$space)), ((4*$height)+(5*$space)));
+	my $white = $mainimage->colorAllocate(255,255,255);
 
 
-#A1
-$mainimage->copy($myimage[0],$space,$space,0,0,$width,$height);
-#B1
-$mainimage->copy($myimage[1],($width+(2*$space)),$space,0,0,$width,$height);
-#A2
-$mainimage->copy($myimage[2],$space,($height+(2*$space)),0,0,$width,$height);
-#B2
-$mainimage->copy($myimage[3],($width+(2*$space)),($height+(2*$space)),0,0,$width,$height);
-#A3
-$mainimage->copy($myimage[4],$space,((2*$height)+(3*$space)),0,0,$width,$height);
-#B3
-$mainimage->copy($myimage[5],($width+(2*$space)),((2*$height)+(3*$space)),0,0,$width,$height);
-#A4
-$mainimage->copy($myimage[6],$space,((3*$height)+(4*$space)),0,0,$width,$height);
+	#A1
+	$mainimage->copy($myimage[0],$space,$space,0,0,$width,$height);
+	#B1
+	$mainimage->copy($myimage[1],($width+(2*$space)),$space,0,0,$width,$height);
+	#A2
+	$mainimage->copy($myimage[2],$space,($height+(2*$space)),0,0,$width,$height);
+	#B2
+	$mainimage->copy($myimage[3],($width+(2*$space)),($height+(2*$space)),0,0,$width,$height);
+	#A3
+	$mainimage->copy($myimage[4],$space,((2*$height)+(3*$space)),0,0,$width,$height);
+	#B3
+	$mainimage->copy($myimage[5],($width+(2*$space)),((2*$height)+(3*$space)),0,0,$width,$height);
+	#A4
+	$mainimage->copy($myimage[6],$space,((3*$height)+(4*$space)),0,0,$width,$height);
 
-open (CHART, ">$chartname") or print "unable to open the $chartname file ";
-print CHART $mainimage->png;
-close CHART;
-
+	open (CHART, ">$chartname") or print "unable to open the $chartname file ";
+	print CHART $mainimage->png;
+	close CHART;
 }
 return 1;
 
