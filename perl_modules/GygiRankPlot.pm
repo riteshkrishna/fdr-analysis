@@ -2,7 +2,7 @@ package GygiRankPlot;
 require Exporter;
 
 #####################################################################################################
-#        Copyright (C) 2009, Jennifer Siepen, University of Manchester                              #
+#        Copyright (C) 2009, Jennifer Siepen and David Wedge, University of Manchester              #
 #                                                                                                   #
 #    This program is free software: you can redistribute it and/or modify                           #
 #    it under the terms of the GNU General Public License as published by                           #
@@ -27,167 +27,152 @@ our @EXPORT = qw(GetGygiRankPlot);
 use strict;
 use URI::Escape;
 
-use lib qw(~/LIVERPOOL/bin/perl_modules/);
+use lib "/var/www/localhost/cgi-bin/FDRAnalysis/perl_modules/";
 use strict;
 use CreatePNG;
 
 
 sub GetGygiRankPlot
 {
-my $REV_TAG = shift;
-my $se = shift;
-my $imagefile = shift;
-my $cutoff = shift;
-my @results = @_;
+	print("getting rank plot\n");
 
-my $engine;
- if($se eq "M")
- {
- $engine = "Mascot";
- }
- elsif($se eq "O")
- {
- $engine = "Omssa";
- }
- elsif($se eq "T")
- {
- $engine = "XTandem";
- } 
+	my $REV_TAG = shift;
+	my $se = shift;
+	my $imagefile = shift;
+	my $cutoff = shift;
+	my @results = @_;
 
-my @graph;
+	my $engine;
+	if($se eq "M")
+	{
+		$engine = "Mascot";
+	}
+		elsif($se eq "O")
+	{
+		$engine = "Omssa";
+	}
+	elsif($se eq "T")
+	{
+		$engine = "XTandem";
+	} 
 
-my $max_rank = 0;
-#only include reverse if rank 1 is > $cutoff expect
+	my @graph;
 
+	my $max_rank = 0;
+	#only include reverse if rank 1 is < $cutoff expect
 
- for(my $r=1 ; $r<scalar(@results) ; $r++)
- {
-  #sometimes mascot doesn't cover all sequence
+	print("rank results size: ".scalar(@results).". cutoff=".$cutoff."\n");
 
-  if($results[$r][1]{'sequence'} && $results[$r][1]{'protein'} && $results[$r][1]{'expect'}<$cutoff)
-  {
-   for(my $rank=1 ; $rank<(scalar(@{$results[$r]})) ; $rank++)
-   {
+	#DCW - CHECK starting index
+	#for(my $r=1 ; $r<scalar(@results) ; $r++)
+	for(my $r=0 ; $r<scalar(@results) ; $r++)
+	{
+		#sometimes mascot doesn't cover all sequence
+		#print("r:".$results[$r][1]{'sequence'}.", ". $results[$r][1]{'protein'}.", ". $results[$r][1]{'expect'}."\n");
+		#if($results[$r][1]{'sequence'} && $results[$r][1]{'protein'} && $results[$r][1]{'expect'}<$cutoff)
+		if($results[$r][1]{'sequence'} && $results[$r][1]{'protein'} && ($results[$r][1]{'expect'}<=$cutoff || $results[$r][1]{'expect'} eq $cutoff)) #DCW: use <=, otherwise no peptides may be found
+		{
+			#print($results[$r][1]{'sequence'}." OK\n");
+			for(my $rank=1 ; $rank<(scalar(@{$results[$r]})) ; $rank++)
+			{
+				if($rank>$max_rank)
+				{
+					$max_rank = $rank;
+				}
 
-    if($rank>$max_rank)
-    {
-    $max_rank = $rank;
-    }
+				#if($results[$r][$rank]{'protein'} =~ m/^$REV_TAG/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)
+				if($results[$r][$rank]{'protein'} =~ m/$REV_TAG/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)#DCW - rev_tag doesn't have to be at the start
+				{
+					print("REV HIT: rank".$rank.", ".$results[$r][$rank]{'protein'}."\n");
+					if($graph[1][$rank])
+					{
+						$graph[1][$rank]++;
+					}
+					else
+					{
+						$graph[1][$rank] = 1;
+					}
+				}
+				#elsif($results[$r][$rank]{'protein'})
+				elsif($results[$r][$rank]{'protein'} =~ m/\S/)#protein must contain non-whitespace
+				{
+					print("FORWARD HIT: rank=".$rank.", ".$results[$r][$rank]{'protein'}."\n");
+					if($graph[0][$rank])
+					{
+						$graph[0][$rank]++;
+					}
+					else
+					{
+						$graph[0][$rank] = 1;
+					}
+				}
+				else
+				{
+					print("NO HIT: rank=".$rank.", ".$results[$r][$rank]{'protein'}."\n");
+				}
+			}
+		}
+	}
 
-    if($results[$r][$rank]{'protein'} =~ m/^$REV_TAG/ || $results[$r][$rank]{'protein'} =~ m/\_r$/)
-    {  
+	#for each rank calculate the total forward and reverse
+	my @plotdata;
+	my $min = 0;
+	my $max = 10;
 
-     if($graph[1][$rank])
-     {
-     $graph[1][$rank]++;
-     }
-     else
-     {
-     $graph[1][$rank] = 1;
-     }
-    }
-    elsif($results[$r][$rank]{'protein'})
-    {
-     if($graph[0][$rank])
-     {
-     $graph[0][$rank]++;
-     }
-     else
-     {
-     $graph[0][$rank] = 1;
-     }
-    }
-   }
-  }
- }
+	$max_rank++;
 
-#for each rank calculate the total forward and reverse
-my @plotdata;
-my $min = 0;
-my $max = 10;
+	for(my $rank=1 ; $rank<$max_rank ; $rank++)
+	{
+		my $for;
+		my $rev;
+		if(!$graph[0][$rank] && !$graph[1][$rank])
+		{
+			$for = 0;
+			$rev = 0;
+		}
+		elsif(!$graph[0][$rank] && $graph[1][$rank])
+		{
+			$for = 0;
+			$rev = 100; 
+		}
+		elsif($graph[0][$rank] && !$graph[1][$rank])
+		{
+			$for = 100;
+			$rev = 0;
+		}
+		else
+		{
+			my $total = $graph[0][$rank] + $graph[1][$rank];
+			$for = $graph[0][$rank]/$total*100;
+			$rev = $graph[1][$rank]/$total*100;
+		}
 
-$max_rank++;
+		print("bar chart data: ".$rank.", ".$for.", ".$rev."\n");
 
- for(my $rank=1 ; $rank<$max_rank ; $rank++)
- {
- my $for;
- my $rev;
-  if(!$graph[0][$rank] && !$graph[1][$rank])
-  {
-  $for = 0;
-  $rev = 0;
-  }
-  elsif(!$graph[0][$rank] && $graph[1][$rank])
-  {
-  $for = 0;
-  $rev = 100; 
-  }
-  elsif($graph[0][$rank] && !$graph[1][$rank])
-  {
-  $for = 100;
-  $rev = 0;
-  }
-  else
-  {
-  my $total = $graph[0][$rank] + $graph[1][$rank];
-  $for = $graph[0][$rank]/$total*100;
-  $rev = $graph[1][$rank]/$total*100;
-  }
+		$plotdata[0][$rank-1] = $rank;
+		$plotdata[1][$rank-1] = $for;
+		$plotdata[2][$rank-1] = $rev;
+	}
 
+	#and now the png
+	my $image;
 
- $plotdata[0][$rank-1] = $rank;
- $plotdata[1][$rank-1] = $for;
- $plotdata[2][$rank-1] = $rev;
- }
+	#my $title = $engine . " Gygi Rank Plot";
+	my $title = "$engine";
+	print "in GygiRank about to call bars\n";
+	$image = GetPNGBars($title,'rank','percent',$min,$max,@plotdata);
 
-#and now the png
-my $image;
+	my $mainimage = new GD::Image((450), (300));
+	my $white = $mainimage->colorAllocate(255,255,255);
 
-#my $title = $engine . " Gygi Rank Plot";
-my $title = "$engine";
-print "in GygiRank about to call bars\n";
-$image = GetPNGBars($title,'rank','percent',$min,$max,@plotdata);
+	$mainimage->copy($image,0,0,0,0,450,300);
+	open (CHART, ">$imagefile") or print "unable to open the $imagefile file ";
+	print CHART $mainimage->png;
+	close CHART;
 
- my $mainimage = new GD::Image((450), (300));
- my $white = $mainimage->colorAllocate(255,255,255);
-
- $mainimage->copy($image,0,0,0,0,450,300);
- open (CHART, ">$imagefile") or print "unable to open the $imagefile file ";
- print CHART $mainimage->png;
- close CHART;
-
-return 1;
-
+	print("Gygi image file= $imagefile");
+	return 1;
 }
-
-
 return 1;
-
-
-
-
- 
-sub GetDbPath
-{
-my $file = shift;
-my $db;
-open(FILE,"<$file") or die "unable to open the mascot results, $file\n";
- while(my $line = <FILE>)
- {
-  if($line =~ m /^fastafile\=/)
-  {
-  my @split = split/\=/,$line;
-  $db = $split[1];
-  close FILE;
-  }  
- }
-close FILE;
-
-$db =~ s/\/usr\/local\/mascot\//\/fs\/msct\//;
-
-
-return $db;
-
-}
 
 
