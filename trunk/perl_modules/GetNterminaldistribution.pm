@@ -36,6 +36,7 @@ sub GetNtermPlot
 	my $se = shift;
 	my $imagefile = shift;
 	my $REVTAG = shift;
+	my $cutoff = shift;#DCW
 	my @results = @_;
 
 
@@ -62,7 +63,6 @@ sub GetNtermPlot
 	for(my $r=1 ; $r<scalar(@results) ; $r++)
 	{
 		#sometimes mascot doesn't cover all sequence
-
 		if($results[$r][1]{'sequence'} && $results[$r][1]{'sequence'} ne "NULL")
 		{
 			#only rank 1
@@ -79,7 +79,8 @@ sub GetNtermPlot
 
 				print("Nterm expect value=".$results[$r][$rank]{'expect'}.", REV=".$rev."\n");
 
-				if($results[$r][$rank]{'expect'}<0.05)
+				#if($results[$r][$rank]{'expect'}<0.05)
+				if($results[$r][$rank]{'expect'}<$cutoff)#DCW - allow user to choose cutoff
 				{
 					#DCW
 					if($start>$max)
