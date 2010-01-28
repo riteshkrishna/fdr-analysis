@@ -74,10 +74,13 @@ sub GetPNGVenn
 	my $white = $mainimage->colorAllocate(255,255,255);
 
 	# Draw the first circle
-	$im->arc(50,50,100,100,0,360,$black);
-	$im->fill(50,50,$white);
-	$mainimage->copy($im,50,50,0,0,100,100);
-	$mainimage->string(gdSmallFont,10,25,$res[0][1],$black);
+	if($res[0][1])
+	{
+		$im->arc(50,50,100,100,0,360,$black);
+		$im->fill(50,50,$white);
+		$mainimage->copy($im,50,50,0,0,100,100);
+		$mainimage->string(gdSmallFont,10,25,$res[0][1],$black);
+	}
 
 	#draw the second circle
 	if($res[0][2])
@@ -96,31 +99,31 @@ sub GetPNGVenn
 	}
 
 	#and now for the values
-	if($res[1][0])
+	if($res[1][0] ne "")
 	{
 		$mainimage->string(gdSmallFont,75,75,$res[1][0],$black);
 	}
-	if($res[1][2])
+	if($res[1][2] ne "")
 	{
 		$mainimage->string(gdSmallFont,115,75,$res[1][2],$black);
 	}
-	if($res[2][0])
+	if($res[2][0] ne "")
 	{
 		$mainimage->string(gdSmallFont,165,75,$res[2][0],$black);
 	}
-	if($res[1][3])
+	if($res[1][3] ne "")
 	{
 		$mainimage->string(gdSmallFont,90,125,$res[1][3],$black);
 	}
-	if($res[0][0]) 
+	if($res[0][0] ne "") 
 	{
 		$mainimage->string(gdSmallFont,110,110,$res[0][0],$black);
 	}
-	if($res[2][3])
+	if($res[2][3] ne "")
 	{
 		$mainimage->string(gdSmallFont,150,125,$res[2][3],$black);
 	}
-	if($res[3][0])
+	if($res[3][0] ne "")
 	{
 		$mainimage->string(gdSmallFont,125,160,$res[3][0],$black);
 	}
