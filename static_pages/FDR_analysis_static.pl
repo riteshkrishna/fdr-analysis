@@ -460,7 +460,7 @@ sub main_content()
 			while(my $line = <FILE>)
 			{
 				$blurb .= $line;
-				$blurb .= "<BR><BR>";
+				#$blurb .= "<BR><BR>";
 			}
 			close FILE;
 
@@ -471,15 +471,30 @@ sub main_content()
 			system($cmd);
 			my $path_to_tmp = $webpath."tmp/";
 			$new_peptideOutput =~ s/$local_webpath/$path_to_tmp/;
-			$blurb .= "<BR><font size=-2><I><B>E</B> FDR method (Elias & Gygi (2007) Nat. Methods 4: 207-214) <BR> <B>K</B> FDR method (Kall et al. (2008) J. Proteome Res. 7:29-34).</I></FONT>"; 
-			$blurb .= "<BR><font size=-2><I><B>*</B> Combined method as described in Jones et al. (2009) Proteomics 9: 1220-9.</I></FONT>"; 
+			$blurb .= "<BR><font size=-2><I><B><sup>\#</sup></B> FDR method as decsribed in Kall et al. (2008) J. Proteome Res. 7:29-34.</I></FONT>"; 
+			$blurb .= "<BR><font size=-2><I><B>*</B> Combined method as described in Jones et al. (2009) Proteomics 9: 1220-9.</I></FONT>";
+
+			my $nter = $session->param("nterminal");
+			if($session->param("nterminal"))
+			{
+				$blurb .= "<br><font size=-2><I>Numbers in brackets indicate the number of N-terminal peptides identified</i></FONT>";
+			}
+
 			#$blurb .=  "<BR><BR><P>To download a list of identified peptides/proteins please click <a href=\"$newpeplist\" target=\"top\">here</a><BR>";
 			$blurb .=  "<BR><BR><P>To download a list of identified peptides/proteins please click <a href=\"$new_peptideOutput\" target=\"top\">here</a><BR>";
 
 			if($session->param("combine") == 1)
 			{
-				my $combinedlist = $webpath."tmp/".$session->id . "combined_peptides.out";
+				#my $combinedlist = $webpath."tmp/".$session->id . "combined_peptides.out";
+				my $combinedlist = $new_peptideOutput;#DCW - temporary fix, download peptideOutput
 				$blurb .=  "<BR><P>To download a list of identified peptides from the combined analysis please click <a href=\"$combinedlist\" target=\"top\">here</a><BR>";
+				my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$session->id.".mzid";
+				my $newProtAmbigFile = $out_protGroupMzId;
+				$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
+				$cmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
+				system($cmd);
+				$newProtAmbigFile =~ s/$local_webpath/$path_to_tmp/;
+				$blurb .=  "<BR><P>To download a protein ambiguity file in mzident format from the combined analysis please click <a href=\"$newProtAmbigFile\" target=\"top\">here</a><BR>";
 			}
 
 			$title = "Results Summary";
@@ -571,7 +586,7 @@ sub main_content()
 
 		#only if the user requested Nter do we display the nter option
 		#my $nterminal = " ";
-		#if($session->param("nterminal") == 1)
+		#if($session->param("nterminal"))
 		#{
 			#$nterminal = qq{<li><a href=$web_cgipath."FDR_analysis_static.pl?result_view=nterdist">Nterminal Distribution</a></li>};
 			#$nterminal = qq{<li><a href=$web_cgipath."FDR_analysis_static.pl?result_view=nterdist">Positional Distribution</a></li>};
@@ -941,22 +956,45 @@ sub RunAnalysis
 	}
 
 	my $expect = $session->param('max_expect');
-	$cmd = "perl RunGraphics.pl -F $mascot_file -S mascot -G $mascot_graphics_file -R $revString -M $expect -D $decoySize\n";
-	print SHELL $cmd;
-	$cmd = "perl RunGraphics.pl -F $omssa_file -S omssa -G $omssa_graphics_file -R $revString -M $expect -D $decoySize\n";
-	print SHELL $cmd;
-	$cmd = "perl RunGraphics.pl -F $tandem_file -S X!Tandem -G $tandem_graphics_file -R $revString -M $expect -D $decoySize\n";
-	print SHELL $cmd;
+	if($mascot_file)
+	{
+		$cmd = "perl RunGraphics.pl -F $mascot_file -S mascot -G $mascot_graphics_file -R $revString -M $expect -D $decoySize\n";
+		print SHELL $cmd;
+	}
+	if($omssa_file)
+	{
+		$cmd = "perl RunGraphics.pl -F $omssa_file -S omssa -G $omssa_graphics_file -R $revString -M $expect -D $decoySize\n";
+		print SHELL $cmd;
+	}
+	if($tandem_file)
+	{
+		$cmd = "perl RunGraphics.pl -F $tandem_file -S X!Tandem -G $tandem_graphics_file -R $revString -M $expect -D $decoySize\n";
+		print SHELL $cmd;
+	}
 
 	#Summary
-	$cmd = "perl RunSummary.pl -V $out_verbosePeptideOutput -S $summary_file -D $decoySize -T 0.01,0.05\n"; #DCW - last param (FDR cutoffs) should be set by user
+	$cmd = "perl RunSummary.pl -V $out_verbosePeptideOutput -S $summary_file -D $decoySize -T 0.01,0.05"; #DCW - last param (FDR cutoffs) should be set by user
+	if($session->param("nterminal"))
+	{
+		$cmd .= " -N";
+	}
+	if($session->param("combine"))
+	{
+		$cmd .= " -C";
+	}
+	$cmd .= "\n";
 	#$cmd = "perl RunSummary.pl $out_verbosePeptideOutput $summary_file $decoySize 0.01,0.05\n"; #DCW - last param (FDR cutoffs) should be set by user
 	print SHELL $cmd;
 
 	#Venn diags
 	my $vennFile = $summary_file;
 	$vennFile =~ s/summary.txt/VennDiagram.png/;
-	$cmd = "perl RunVenn.pl -F $vennFile -V $out_verbosePeptideOutput -T 0.05\n"; #DCW - last param (FDR cutoff) should be set by user
+	$cmd = "perl RunVenn.pl -F $vennFile -V $out_verbosePeptideOutput -T 0.05"; #DCW - last param (FDR cutoff) should be set by user
+	if($session->param("combine"))
+	{
+		$cmd .= " -C";
+	}
+	$cmd .= "\n";
 	#$cmd = "perl RunVenn.pl $vennFile $out_verbosePeptideOutput 0.05\n"; #DCW - last param (FDR cutoff) should be set by user
 	print SHELL $cmd;
 
