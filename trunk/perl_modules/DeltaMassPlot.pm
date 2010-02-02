@@ -55,12 +55,15 @@ sub GetDeltaMassPlot
 		$engine = "XTandem";
 	}
 
+	#print("DeltaMass results size=".scalar(@results)."\n");
 
 	my %delta;
 	my %delta1;
 	my $max_tmp=0;
 	for(my $r=1 ; $r<scalar(@results) ; $r++)
 	{
+		#print("delta mass sequence: ".$results[$r][1]{'sequence'}."\n");
+
 		#sometimes mascot doesn't cover all sequence
 		if($results[$r][1]{'sequence'} && $results[$r][1]{'sequence'} ne "NULL")
 		{
@@ -83,7 +86,7 @@ sub GetDeltaMassPlot
 					$disc = $score;
 				}
 
-				print("disc= $disc,delta= $results[$r][$rank]{'delta'} \n");
+				#print("disc= $disc,delta= $results[$r][$rank]{'delta'} \n");
 
 				if($setype ne "O")
 				{
@@ -102,15 +105,19 @@ sub GetDeltaMassPlot
 
 				#for the reverses
 				#if($results[$r][$rank]{'protein'} =~ m/^$REVTAG/)
+				print("delta mass protein: ".$results[$r][$rank]{'protein'}."*\n");
 				if($results[$r][$rank]{'protein'} =~ m/$REVTAG/)#DCW - revtag doesn't have to be at the start
 				{
 					#reverse hits
 					$delta{$results[$r][$rank]{'delta'}} = $disc;
+					print("rev hit\n");
 				}
-				elsif($results[$r][$rank]{'protein'})
+				#elsif($results[$r][$rank]{'protein'})
+				elsif($results[$r][$rank]{'protein'} =~ m/\S/)#protein must contain non-whitespace
 				{
 					#forward hits
-					$delta1{$results[$r][$rank]{'delta'}} = $disc;     
+					$delta1{$results[$r][$rank]{'delta'}} = $disc;
+					print("forward hit\n");    
 				}
 			}
 		}

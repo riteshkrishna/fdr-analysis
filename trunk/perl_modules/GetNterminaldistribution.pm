@@ -60,9 +60,13 @@ sub GetNtermPlot
 	#my $min = 1;
 	my $max = 1;
 
+	#print("Nterm results size=".scalar(@results)."\n");
+
 	for(my $r=1 ; $r<scalar(@results) ; $r++)
 	{
 		#sometimes mascot doesn't cover all sequence
+		#print("Nterm sequence: ".$results[$r][1]{'sequence'}."\n");
+
 		if($results[$r][1]{'sequence'} && $results[$r][1]{'sequence'} ne "NULL")
 		{
 			#only rank 1
@@ -77,7 +81,7 @@ sub GetNtermPlot
 
 				my $start = $results[$r][$rank]{'start'};
 
-				print("Nterm expect value=".$results[$r][$rank]{'expect'}.", REV=".$rev."\n");
+				#print("Nterm expect value=".$results[$r][$rank]{'expect'}.", REV=".$rev.", protein=".$results[$r][$rank]{'protein'}.", start=".$start."\n");
 
 				#if($results[$r][$rank]{'expect'}<0.05)
 				if($results[$r][$rank]{'expect'}<$cutoff)#DCW - allow user to choose cutoff
@@ -114,7 +118,7 @@ sub GetNtermPlot
 		$total[1] += $nterm{$position}[1];
 	}
 
-	print("Nterm max=".$max."\n");
+	#print("Nterm max=".$max."\n");
 
 	#DCW - split into compartments, plus N-terminal
 	my $noSplits = 8;
@@ -158,7 +162,7 @@ sub GetNtermPlot
 		}
 		my $groupedPos = $minPos . "-" . $maxPos;
 
-		print("groupedPos=".$groupedPos.", nTerm0=".$nterm{$position}[0].", nTerm1=".$nterm{$position}[1]."\n");
+		#print("groupedPos=".$groupedPos.", nTerm0=".$nterm{$position}[0].", nTerm1=".$nterm{$position}[1]."\n");
 		if($groupedData{$groupedPos}[0])
 		{
 			$groupedData{$groupedPos}[0] += $nterm{$position}[0];
@@ -226,7 +230,7 @@ sub GetNtermPlot
 	{
 		if($sorted[$s])
 		{
-			print("PLOT DATA:".$sorted[$s].",".$groupedData{$sorted[$s]}[0].",".$groupedData{$sorted[$s]}[1].",".$plotdata[1][$sorted[$s]].",".$plotdata[2][$sorted[$s]]."\n");
+			#print("PLOT DATA:".$sorted[$s].",".$groupedData{$sorted[$s]}[0].",".$groupedData{$sorted[$s]}[1].",".$plotdata[1][$sorted[$s]].",".$plotdata[2][$sorted[$s]]."\n");
 
 			$sorted_plot_data[0][$count] = $sorted[$s];
 			#$sorted_plot_data[1][$count] = $groupedData{$sorted[$s]}[0];

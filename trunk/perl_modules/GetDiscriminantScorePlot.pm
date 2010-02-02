@@ -124,19 +124,22 @@ sub GetScoreDistribution
 					$rev = 1;
 				}   
 
-				if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<1000)
+				if($results[$r][$rank]{'protein'} =~ m/\S/)#protein must contain non-whitespace
 				{
-					$distribution{$disc}[$rev]++;
-				}
-				elsif(!$distribution{$disc}[$rev])
-				{
-					$distribution{$disc}[$rev] = 1;
+					if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<1000)
+					{
+						$distribution{$disc}[$rev]++;
+					}
+					elsif(!$distribution{$disc}[$rev])
+					{
+						$distribution{$disc}[$rev] = 1;
+					}
 				} 
 			}
 		}
 	}
 
-	print("discriminant score plot: max=".$max.", min=".$min."\n");
+	#print("discriminant score plot: max=".$max.", min=".$min."\n");
 
 	#DCW 190110 - floor/ceil no nearest $labelInterval
 	my $labelInterval = 5;
@@ -201,7 +204,8 @@ sub GetScoreDistribution
 
 	if($setype ne "O")
 	{
-		$scoretype .= " score";
+		#$scoretype .= " score";
+		$scoretype = "score";
 	}
 	else
 	{
