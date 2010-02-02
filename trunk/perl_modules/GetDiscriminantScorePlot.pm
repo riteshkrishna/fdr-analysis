@@ -139,7 +139,7 @@ sub GetScoreDistribution
 		}
 	}
 
-	#print("discriminant score plot: max=".$max.", min=".$min."\n");
+	print("\ndiscriminant score plot: max=".$max.", min=".$min."\n");
 
 	#DCW 190110 - floor/ceil no nearest $labelInterval
 	my $labelInterval = 5;
@@ -149,7 +149,7 @@ sub GetScoreDistribution
 	}
 	else
 	{
-		$min = (int(($min-0.000001)/$labelInterval)+1)*$labelInterval;
+		$min = (int(($min-0.000001)/$labelInterval)-1)*$labelInterval;
 	}
 	if($max<0)
 	{
@@ -159,6 +159,7 @@ sub GetScoreDistribution
 	{
 		$max = (int(($max-0.000001)/$labelInterval)+1)*$labelInterval;
 	}
+	print("discriminant score plot floored/ceiled: max=".$max.", min=".$min."\n");
 
 	my @plotdata;
 	#DCW 190110
@@ -190,6 +191,7 @@ sub GetScoreDistribution
 	#DCW 190110
 	foreach my $score (keys %distribution)
 	{
+		print("scoreplot score: ".$score."\n");
 		if($distribution{$score}[0])
 			{
 			#$plotdata[1][$score-$min] = $distribution{$score}[0];
