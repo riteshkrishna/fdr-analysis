@@ -104,15 +104,17 @@ sub ZoomScoreDistribution
 					$rev = 1;
 				} 
 
-				if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<100)
+				if($results[$r][$rank]{'protein'} =~ m/\S/)#protein must contain non-whitespace
 				{
-					$distribution{$disc}[$rev]++;
+					if($distribution{$disc}[$rev] && $distribution{$disc}[$rev]<100)
+					{
+						$distribution{$disc}[$rev]++;
+					}
+					elsif(!$distribution{$disc}[$rev])
+					{
+						$distribution{$disc}[$rev] = 1;
+					} 
 				}
-				elsif(!$distribution{$disc}[$rev])
-				{
-					$distribution{$disc}[$rev] = 1;
-				} 
-
 			}
 		}
 	}
