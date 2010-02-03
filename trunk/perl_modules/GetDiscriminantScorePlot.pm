@@ -48,6 +48,8 @@ sub GetScoreDistribution
 	my $max = 0;
 	my @scoresorter;
 
+	my $labelInterval = 5;
+
 	my $engine;
 	if($setype eq "M")
 	{
@@ -61,7 +63,11 @@ sub GetScoreDistribution
 	{
 		$engine = "XTandem";
 	}
-
+	elsif($setype eq "C")
+	{
+		$engine = "Consensus";
+		$labelInterval = 0.1;
+	}
 	for(my $r=1 ; $r<scalar(@results) ; $r++)
 	{
  		#sometimes mascot doesn't cover all sequence
@@ -85,26 +91,38 @@ sub GetScoreDistribution
 					$disc = $score;
 				}
 
-				if($setype ne "O")
-				{
-					#$disc = int($disc);
-				}
-				else
+				if($setype eq "O")
 				{
 					#DCW - 211209
 					$disc = $results[$r][$rank]{'expect'};
 					$disc = -log($disc);
-
 				}
-
-				#DCW 190110 - convert to integer value, allowing for negative numbers
-				if($disc<0)
+				elsif($setype eq "C")
 				{
-					$disc=-int(-$disc-0.000001)-1;
+					$disc = $results[$r][$rank]{'FDR_score'};
+					#print("consensus score=".$disc."\n");
 				}
 				else
 				{
-					$disc=int($disc);
+					#$disc = int($disc);
+				}
+
+				#DCW 190110 - convert to integer value, allowing for negative numbers
+				if($labelInterval>=1)#condition added 020310
+				{
+					if($disc<0)
+					{
+						$disc=-int(-$disc-0.000001)-1;
+					}
+					else
+					{
+						$disc=int($disc);
+					}
+				}
+				else
+				{
+					#$disc = sprintf("%.2f",$disc);
+					$disc = sprintf("%.1f",$disc);
 				}
 
 				if($disc>$max)
@@ -139,10 +157,9 @@ sub GetScoreDistribution
 		}
 	}
 
-	print("\ndiscriminant score plot: max=".$max.", min=".$min."\n");
+	#print("\ndiscriminant score plot: max=".$max.", min=".$min."\n");
 
 	#DCW 190110 - floor/ceil no nearest $labelInterval
-	my $labelInterval = 5;
 	if($min<0)
 	{
 		$min = -(int((-$min-0.000001)/$labelInterval)+1)*$labelInterval;
@@ -159,19 +176,48 @@ sub GetScoreDistribution
 	{
 		$max = (int(($max-0.000001)/$labelInterval)+1)*$labelInterval;
 	}
-	print("discriminant score plot floored/ceiled: max=".$max.", min=".$min."\n");
+
+	if($setype eq "C")
+	{
+		$min = 0.0;
+		$max = 1.0;
+	}
+	#print("discriminant score plot floored/ceiled: max=".$max.", min=".$min."\n");
 
 	my @plotdata;
 	#DCW 190110
-	for(my $i=$min;$i<=$max;$i++)
+	if($labelInterval>=1)#condition added 020310
 	{
-		if($i % $labelInterval == 0)
+		for(my $i=$min;$i<=$max;$i++)
 		{
-		  	$plotdata[0][$i-$min] = $i;
+			if($i % $labelInterval == 0)
+			{
+			  	$plotdata[0][$i-$min] = $i;
+			}
+			else
+			{
+				$plotdata[0][$i-$min] = '';
+			}
 		}
-		else
+	}
+	else
+	{
+		#for(my $i=int($min*100);$i<=int($max*100);$i++)
+		#{
+		#	if($i % 10 == 0)
+		#	{
+		#		print("adding label: ".$i."\n");
+		#	  	$plotdata[0][int($i-$min*100)] = $i/100.0;
+		#	}
+		#	else
+		#	{
+		#		print("skipping label: ".$i."\n");
+		#		$plotdata[0][int($i-$min*100)] = '';
+		#	}
+		#}
+		for(my $i=int($min*10);$i<=int($max*10);$i++)
 		{
-			$plotdata[0][$i-$min] = '';
+			$plotdata[0][int($i-$min*10)] = $i/10.0;
 		}
 	}
 
@@ -191,27 +237,52 @@ sub GetScoreDistribution
 	#DCW 190110
 	foreach my $score (keys %distribution)
 	{
-		print("scoreplot score: ".$score."\n");
+		#print("scoreplot score: ".$score."\n");
 		if($distribution{$score}[0])
+		{
+			if($labelInterval>=1)
 			{
-			#$plotdata[1][$score-$min] = $distribution{$score}[0];
-			$plotdata[1][$score-$min] = $distribution{$score}[0]/$totals[0]*100;#convert to %
+				#$plotdata[1][$score-$min] = $distribution{$score}[0];
+				$plotdata[1][$score-$min] = $distribution{$score}[0]/$totals[0]*100;#convert to %
+			}
+			else
+			{
+				#$plotdata[1][($score-$min)*100] = $distribution{$score}[0]/$totals[0]*100;#convert to %
+				$plotdata[1][($score-$min)*10] = $distribution{$score}[0]/$totals[0]*100;#convert to %
+			}
 		}
 		if($distribution{$score}[1])
 		{
-			#$plotdata[2][$score-$min] = $distribution{$score}[1];
-			$plotdata[2][$score-$min] = $distribution{$score}[1]/$totals[1]*100;#convert to %
+			if($labelInterval>=1)
+			{
+				#$plotdata[2][$score-$min] = $distribution{$score}[1];
+				$plotdata[2][$score-$min] = $distribution{$score}[1]/$totals[1]*100;#convert to %
+			}
+			else
+			{
+				#$plotdata[2][($score-$min)*100] = $distribution{$score}[1]/$totals[1]*100;#convert to %
+				$plotdata[2][($score-$min)*10] = $distribution{$score}[1]/$totals[1]*100;#convert to %
+			}
 		}
 	}
 
-	if($setype ne "O")
+	if($setype eq "O")
 	{
-		#$scoretype .= " score";
-		$scoretype = "score";
+		$scoretype = "-log(expect)";
+
+	}
+	elsif($setype eq "C")
+	{
+		$scoretype = "FDR";
+	}
+	elsif($setype eq "T")
+	{
+		$scoretype = "hyperscore";
 	}
 	else
 	{
-		$scoretype = "-log(expect)";
+		#$scoretype .= " score";
+		$scoretype = "score";
 	}
 	my $title = $engine . " Score Distribution";
 

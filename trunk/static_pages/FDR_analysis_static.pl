@@ -539,7 +539,7 @@ sub main_content()
 					$final_image_line .= "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Rank plot image\">";
 				}			
 			}
-			$blurb = "<BR><P>This plot is the percentage of forward and reverse hits at different identified ranks where the rank 1 peptide has an expect value of " . $session->param("max_expect") . " or less.  Rank 1 should have very few reverse hits whereas ranks 2-> should have approximately 50% forward and 50% reverse (as these represent false positives)(based on that of Elias & Gygi (2007) Nat. Methods 4: 207-214).";
+			$blurb = "<BR><P>This plot is the percentage of target and decoy hits at different identified ranks where the rank 1 peptide has an expect value of " . $session->param("max_expect") . " or less.  Rank 1 should have very few decoy hits whereas rank 2 and later ranks should have approximately 50% target and 50% decoy hits (as these ranks represent false positives)<br><FONT size=-2>(Graph based on that of <i>Elias & Gygi (2007) Nat. Methods 4: 207-214</i>).";
 			$title = "Rank Plot";
 		}
 		elsif($cgi->param("result_view") eq "deltamass")
@@ -552,7 +552,7 @@ sub main_content()
 					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Rank plot image\">";
 				}
 			}
-			$blurb = "<BR><P>This image represents a plot of the mass differences of all identifications vs. score between experimental and theoretical masses.  A normal distribution around the 0 axis is expected";
+			$blurb = "<BR><P>This is a plot of score vs. delta mass difference for all identifications. Delta mass is defined as the difference between the experimental and theoretical masses.  A normal distribution around Delta Mass=0 is expected.";
 			$title = "Delta Mass";
 		}
 		elsif($cgi->param("result_view") eq "nterdist")
@@ -565,9 +565,9 @@ sub main_content()
 					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Start position  plot image\">";
 				}
 			}
-			$blurb = "<BR><P>This plot is part of the N-terminal proteome analysis pipeline.  This analysis specifically targets the N-terminal peptides and as a result the forward hits should be located predominantly at positions 1 and 2 and the reverse scattered randomly amongst all other positions. (Note max spectra shown on y-axis is 100 for a clearer view).";
+			$blurb = "<BR><P>This plot is part of the N-terminal proteome analysis pipeline.  This analysis specifically targets the N-terminal peptides and, as a result, the target hits should be located predominantly at positions 1 and 2 of a protein and the decoy hits scattered randomly amongst all other positions.";
 			#$title = "N-terminal distribution";
-			$title = "Start position distribution";#DCW 180110
+			$title = "Start Position Distribution";#DCW 180110
 		}
 		elsif($cgi->param("result_view") eq "scoredist")
 		{
@@ -579,7 +579,12 @@ sub main_content()
 					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Score distribution plot image\">";
 				}
 			}
-			$blurb = "<BR><P>This plot is the distribution of scores for both the forward and reverse hits.  Two normal distributions should be evident, a distribution for reverse scores centered around a poor score and a separate distribution for the forward hits, centered around a better score.";
+			if($session->param('combine'))
+			{
+				my $consensus_graphics_file = $webpath . "tmp/" . $sid . "_consensus_fdranalysis" . "ScoreDist.png";
+				$final_image_line .=  "<IMG SRC=\"$consensus_graphics_file\" title=\"Score distribution plot image\">";
+			}
+			$blurb = "<BR><P>This plot is the distribution of scores for both the target and decoy hits.  Two normal distributions should be evident: a distribution for decoy hits centered around a poor score and a separate distribution for the target hits, centered around a better score.";
 			$title = "Score distribution";
 		}
 		elsif($cgi->param("result_view") eq "zoomscore")
@@ -592,8 +597,13 @@ sub main_content()
 					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Zoomed Score distribution plot image\">";
 				}
 			}
-			$blurb = "<BR><P>This plot shows the estimation of the distribution of correct and incorrect spectra at different scores.  The two distributions should be separate, with the incorrect distribution centered with the poorer scores and the correct at the more confident scores.";
-			$title = "Correct / Incorrect";
+			if($session->param('combine'))
+			{
+				my $consensus_graphics_file = $webpath . "tmp/" . $sid . "_consensus_fdranalysis" . "ZoomScore.png";
+				$final_image_line .=  "<IMG SRC=\"$consensus_graphics_file\" title=\"Zoomed Score distribution plot image\">";
+			}
+			$blurb = "<BR><P>This plot shows the estimated distribution of correct and incorrect spectra at different scores, after allowing for decoy hits.  The two distributions should be separate, with the incorrect distribution centered at the poorer scores and the correct distribution at the more confident scores.";
+			$title = "Estimated Correct / Incorrect Spectra";
 		} 
 		elsif($cgi->param("result_view") eq "combined")
 		{
@@ -602,32 +612,16 @@ sub main_content()
 			if($session->param("combine") == 1)
 			{
 				my $combinedimage = $webpath."tmp\/" . $session->id . "_CombinedVennDiagram.png";
-				$final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of Individual Identification results\"><P>This plot represents the overlap of peptide identifications after combining the results using the FDRScore* method at FDR** " . $session->param("fdr_value") . " or better.<BR><P><FONT size=-1><I>*Jones et al. (2009) Proteomics 9: 1220-9.</I><P><I>**Kall et al. (2008) J. Proteome Res. 7:29-34</I><BR><IMG SRC=\"$combinedimage\" title=\"Venn diagram of Peptides identified from the combined analysis\"><BR>";
+				$final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of Individual Identification results\"><P>This plot represents the overlap of peptide identifications after combining the results using the FDRScore* method at FDR** " . $session->param("fdr_value") . " or better.<BR><!--P--><FONT size=-2><I>*Jones et al. (2009) Proteomics 9: 1220-9.</I><!--P--><BR><I>**Kall et al. (2008) J. Proteome Res. 7:29-34</I><BR><IMG SRC=\"$combinedimage\" title=\"Venn diagram of Peptides identified from the combined analysis\"><BR>";
 			}
 			else
 			{
 				$final_image_line .=  "<IMG SRC=\"$imagefile\" title=\"Venn diagram of Individual Identification results\">";
 			}
 			$blurb = "<BR><P>This plot represents the overlap of peptide identification from the different search engines at FDR* " . $session->param("fdr_value") . " or better.";
-			$blurb .= "<BR><font size=-2><I><b>*</b> Elias and Gygi (2007) Nat. Methods 4:207-214</i></FONT>";
+			$blurb .= "<BR><font size=-2><I><b>*</b> Kall et al. (2008) J. Proteome Res. 7:29-34</i></FONT>";
 			$title = "Overlap of Peptides from different search engines";
 		}
-
-		#only if the user requested Nter do we display the nter option
-		#my $nterminal = " ";
-		#if($session->param("nterminal"))
-		#{
-			#$nterminal = qq{<li><a href=$web_cgipath."FDR_analysis_static.pl?result_view=nterdist">Nterminal Distribution</a></li>};
-			#$nterminal = qq{<li><a href=$web_cgipath."FDR_analysis_static.pl?result_view=nterdist">Positional Distribution</a></li>};
-			#$nterminal=qq{$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=nterdist"},"Start position Distribution"))};
-		#}
-
-		#  #delta
-		#   for(my $i=0 ; $i<scalar(@FDR_image_file) ; $i++)
-		#   {
-		#   $FDR_image_file[$i] =~ s/\.png/DeltaMass\.png/;
-		#   $final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Delta mass plot image\">";
-		#   }
 
 		print  $cgi->div({id=>"main_result"},
 				$cgi->div({id=>"content"},
@@ -650,7 +644,7 @@ sub main_content()
                                 							$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=scoredist"},"Score Distribution")),
                                 							#$nterminal,
 											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=nterdist"},"Start Position Distribution")),
-											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=zoomscore"},"Correct/Incorrect"))
+											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=zoomscore"},"Estimated Correct/Incorrect"))
 										)
 									)
 								)
@@ -669,7 +663,7 @@ sub main_content()
 			)
 		);
 	}
-	backButton();
+	#backButton();
 }
 
 #DCW 101209 - not currently used
@@ -693,7 +687,7 @@ sub footer()
 {
 	print $cgi->div({id=>"footer"},
 	$cgi->div({id=>"path"},
-	$cgi->p("Copyright &copy; 2008",$cgi->a({href=>"mailto:jennifer.siepen\@manchester.ac.uk"},"Jennifer Siepen"))));
+	$cgi->p("Copyright &copy; 2010",$cgi->a({href=>"mailto:david.wedge\@manchester.ac.uk"},"David Wedge"), "& Jennifer Siepen")));
 }
 
 
@@ -1011,6 +1005,12 @@ sub RunAnalysis
 		print SHELL $cmd;
 	}
 
+	if($session->param("combine"))
+	{
+		my $consensus_graphics_file = $local_webpath . $sid . "_consensus_fdranalysis" . ".png";
+		$cmd = "perl RunConsensusGraphics.pl -V $out_verbosePeptideOutput -I $consensus_graphics_file -R $revString -D $decoySize\n";
+		print SHELL $cmd;
+	}
 	print SHELL "cd ".$local_cgibin."\n";
 	print SHELL "perl WriteStatus.pl -F $statusFile -T Creating_Summary\n";
 	print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
@@ -1109,7 +1109,7 @@ sub callTheMzIdentMLParser
 	}	
 
 	#print("<br>FILE 2 after parser=".$session->param("file2_after_parser")."<br>");
-	#print("FILE 3=".$file_3."<br>");	
+	#print("FILE 3=".$file_3."<br>");
 	if($file_3)
 	{
 		( $name_3, $path_3, $extension_3 ) = fileparse ( $file_3, '\..*' );
@@ -1253,7 +1253,6 @@ sub callTheMzIdentMLParser
 	#print SHELL "cd ".$currentWorkdir."\n";
 	close SHELL;	
 	close PARAM;
-	
 }
 
 ### subroutine to create the param file for parsers

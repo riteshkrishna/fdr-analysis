@@ -179,7 +179,7 @@ sub GetPNGBars
 
 
 
-	$mygraph->set_legend('Forward', 'Reverse');
+	$mygraph->set_legend('Target', 'Decoy');
 	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
 
 	print("PNG bars finishing\n");
@@ -234,7 +234,7 @@ sub GetPNGLines
 		$mygraph->set(two_axes=>1);
 		$mygraph->set(y1_label=> $ylabel);
 		$mygraph->set(y2_label=> "spectra count");
-		$mygraph->set_legend('FDR', 'forward spectra count');
+		$mygraph->set_legend('FDR', 'target spectra count');
 	}
 
 	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
@@ -280,7 +280,7 @@ sub GetPNGPoints
 
 
 	$mygraph = SetConstants($mygraph);
-	$mygraph->set_legend('forward', 'reverse');
+	$mygraph->set_legend('Target', 'Decoy');
 	$myimage = $mygraph->plot(\@data) or die $mygraph->error;
 
 	return $myimage;
