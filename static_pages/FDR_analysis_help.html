@@ -25,12 +25,11 @@
 		<br>
 		<a href="#analysis">&nbsp &nbsp Analysis</a>
 		<br>
-		<a href="#mascot_files">&nbsp &nbsp Mascot files</a>
-		<br>
-		<a href="#omssa_files">&nbsp &nbsp OMSSA/X!Tandem Files</a>
-		<br>
+		<a href="#file_upload">&nbsp &nbsp File upload</a>
 		<br>
 		<a href="#results_summary">Results</a>
+		<br>
+		<a href="#results_summary">&nbsp &nbsp Results - Summary</a>
 		<br>
 		<a href="#results_rank">&nbsp &nbsp Results - Rank Plot</a>
 		<br>
@@ -40,76 +39,74 @@
 		<br>
 		<a href="#results_correct">&nbsp &nbsp Results - Correct/Incorrect</a>
 		<br>
-		<a href="#results_nter">&nbsp &nbsp Results - N-terminal Distribution</a>
+		<a href="#results_nter">&nbsp &nbsp Results - Start Position Distribution</a>
 		<br>
 		<br>
-
+		</div>
 		<div id="innerboxheader">
 			<a name="intro"><p>FDR Analysis Help Page</a>
 		</div>
 		<div id="innerbox" align="left">
-			<p>This software enables the user to analyse the results of a Mascot, Omssa and /or X!Tandem database search.  It is specifically targeted towards searches including a decoy database, either searched separately or concatenated to the target database.
+			<p>This software enables the user to analyse the results of a Mascot, Omssa and/or <span style="white-space:nowrap">X!Tandem</span> database search.  It is specifically targeted towards searches including a decoy database, concatenated to the target database.
 			<div id="innerboxheader">
 				<a name= "analysis"><p>Analysis Details</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p><b>N terminal analysis</b> If checked, the analysis will include an N-terminal analysis, which will determine the fraction of identifications that are the N-terminal most peptide of the protein (based on the start position reported by each of the different search engines).
-				<p><b>Decoy tag</b> This is the 'tag' used to mark which proteins are from the decoy search.  This is required when a concatenated search was performed.  It can be included if a tag was used in the decoy database of a search done separately against target and decoy databases.  It is not required for a Mascot decoy search.  For example if the target database has accession >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'.  <B>Please note that the tag must be at the start of the protein accession and have no spaces between it and the protein</B>.
-				<p><b>Combine Results</b> This employs the algorithm described in <i>Jones et al. Proteomics (2009) 9: 1220-9</i> to combine the results of two or more searches from the different search engines.  This search can take a few extra minutes (depending on file sizes) and so please be patient.
-				<p><b>Maximum Expectation Value</b> The maximum expectation value is related to one of the resulting plots and is useful for investigating the results.
-				<p><b>FDR rate</b> The false discovery rate (FDR) you would like the results for.
+				<p><b>N terminal analysis</b> If checked, the analysis will include an N-terminal analysis, which will determine the number of identifications that are the N-terminal most peptide of the protein (based on the start position reported by each of the different search engines).
+				<p><b>Decoy tag</b> This is the 'tag' used to mark the proteins which are decoys. For example, if the target database has a protein with accession number >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'.
+				<p><b>Combine Results</b> This employs the algorithm described in <i>Jones et al. Proteomics (2009) 9: 1220-9</i> to combine the results of two or more searches from the different search engines.  This search can take a few extra minutes (depending on file sizes), so please be patient.
+				<p><b>Maximum Expectation Value</b> The maximum expectation value determines which identifications will be included in the rank plot and start position plot.
+				<p><b>FDR rate</b> Results will be reported up to the false discovery rate (FDR) entered here.
 			</div>
 			<div id="innerboxheader">
-				<a name="mascot_files"><p>Mascot File(s) Upload"</a>
+				<a name="file_upload"><p>File Upload</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p><b>Search type</b> There are 3 types of decoy search a concatenated target/decoy whereby the target and decoy databases were joined and one search was performed.  A Mascot decoy search whereby the 'decoy' checkbox was selected in the Mascot search and finally two searches, one on the target database and a second on the decoy database. Mascot '.dat' files are expected here.
-				<p>The first file upload box is the main upload box and is for any file except the search run solely on the target database, which the second box will contain if applicable.
+				<p><b>Files</b> Uploaded files should be the results of a concatenated target/decoy search, in which the target and decoy databases were joined and one search was performed.
+				<p><b>File types</b> The accepted files types are:  Mascot .dat files; OMSSA .csv files; <span style="white-space:nowrap">X!Tandem</span> .xml files; .mzident files from either Mascot, OMSSA or <span style="white-space:nowrap">X!Tandem</span>.
 			</div>
 			<div id="innerboxheader">
-				<a name="omssa_files"><p>OMSSA/X!Tandem File(s) Upload"</a>
+				<a name= "results_summary"><p>Results Pages - Summary</a>
 			</div>
 			<div id="innerbox" align="left">
-			<p><b>Search type</b> There are 2 types of decoy search for both search engines, a concatenated target/decoy whereby the target and decoy databases were joined and one search was performed or where two searches were performed one on the target database and a second on the decoy database. OMSSA '.csv' result files and X!Tandem '.xml' result files are expected here.
-			<p>The first file upload box is the main upload box and is for any file except the search run solely on the target database, which the second box will contain if applicable
-			</div>
-			<div id="innerboxheader">
-				<a name= "results_summary"><p>Results Pages - summary</a>
-			</div>
-			<div id="innerbox" align="left">
-				<p>A simple table displays the peptide frequencies identified from the search at the chosen FDR.  There are two different FDR calculation methods the first based on a method described by <i>Elias & Gygi (2007) Nat. Methods 4: 207-214</i> and the second a method described by Kall et al. (2008) J. Proteome Res. 7:29-34.  If a combined search was selected these results will be displayed in the table on this page also.  This page also enables the user to download a text file containing a tab separated file of all the peptides and associated proteins identified by the different search engines at the chosen FDR.
+				<p>A simple table displays the peptide frequencies identified from the search at the chosen FDR, separated into total IDs, decoy IDs and estimated correct IDs. If N-terminal analysis has been checked, the number of N-terminal peptides will be reported in brackets. FDR calculation uses the method described by <i>Kall et al. (2008) J. Proteome Res. 7:29-34</i>.  If a combined search was selected these results will also be displayed in the table on this page.  This page also enables the user to download a tab separated file containing all of the peptides and associated proteins identified by the different search engines at the chosen FDR.
 			</div>
 			<div id="innerboxheader">
 				<a name="results_rank"><p>Results Pages - Rank Plot</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p>If target and decoy peptides are equally likely to be selected as matches, lower ranked peptides (which are assumed to be incorrect) should be evenly distributed between the decoy and database portions.  The top ranking identifications on the otherhand are assumed to be correct and so should have a large bias towards target peptides.  The e-value cut-off for the top ranking peptides can be changed on the query for, the default is 0.05.  Rank plots are shown for the different search engines used in the query form.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot.
+				<p>If target and decoy peptides are equally likely to be selected as matches, lower ranked peptides (which are assumed to be incorrect) should be evenly distributed between the decoy and database portions.  The top ranking identifications on the other hand are assumed to be correct and so should have a large bias towards target peptides.  The e-value cut-off for the top ranking peptides can be changed on the query form - the default is 0.05.  Rank plots are shown for the different search engines used in the query form.  Note that <span style="white-space:nowrap">X!Tandem</span> usually provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.
 			</div>
 			<div id="innerboxheader">
 				<a name="results_delta"><p>Results Pages - Delta Mass Plot</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p>Delta Mass plots are shown for the different search engines used in the query form.  These plots represent the difference in mass between the calculated and experimental masses at different scores.  They are based on <i>Elias & Gygi (2007) Nat. Methods 4: 207-214</i>.  Note that X!Tandem provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.  The description of the plot can be seen to the left of the plot.
+				<p>Delta Mass plots are shown for the different search engines used in the query form.  These plots represent the difference in mass between the calculated and experimental masses at different scores.  They are based on <i>Elias & Gygi (2007) Nat. Methods 4: 207-214</i>.  Note that <span style="white-space:nowrap">X!Tandem</span> usually provides only the top ranked peptide identifications and OMSSA doesn't always report all ranks.
 			</div>
 			<div id="innerboxheader">
 				<a name= "results_score"><p>Results Pages - Score Distribution</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p>Score distribution plots are shown for the different search engines used in the query form and can be used to look at the distribution of decoy and target identifications at different scores.  Peptides with lower scores are less likely to be correct and so these plots should show an approximate equal districution of target/decoy peptides at low scores, but a clear difference in the two at higher scores.
+				<p>Score distribution plots are shown for the different search engines used in the query form and can be used to look at the distribution of decoy and target identifications at different scores.  Peptides with lower scores are less likely to be correct and so these plots should show an approximate equal districution of target/decoy peptides at low scores (high FDR), but a clear difference in the two at higher scores (low FDR).
 			</div>
 			<div id="innerboxheader">
-				<a name="results_correct"><p>Results Pages - Correct/Incorrect</a>
+				<a name="results_correct"><p>Results Pages - Estimated Correct/Incorrect</a>
 			</div>
 			<div id= "innerbox" align= "left">
-				<p>Correct/Incorrect plots are shown for the different search engines used in the query form. They are based on those described in Elias & Gygi (2007) Nat. Methods 4: 207-214.  For separate searches estimated correct identifications were calculated by subtracting  the number of decoy peptides from target peptides at a given score threshold, and incorrect identifications were estimated as the minumum number of target or decoy peptides returned at a given score.  For concatenated search correct identifications were estimated by subtracting twice the number of decoy peptides at a given score threshold and incorrect estimated by doubling the number of decoy peptides at a given threshold.
+				<p>Estimated Correct/Incorrect plots are shown for the different search engines used in the query form. They are based on those described in <i>Elias & Gygi (2007) Nat. Methods 4: 207-214</i>. Correct identifications are estimated by subtracting the number of decoy peptides at a given score, weighted by the relative sizes of the decoy and target databases. Incorrect identifications are estimated by multiplying the number of decoy peptides at a given score by the ratio target_database_size/decoy_database_size.
 			</div>
 			<div id="innerboxheader">
-				<a name="results_nter"><p>Results Pages - Nterminal Distribution</a>
+				<a name="results_nter"><p>Results Pages - Start Position Distribution</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p>Nterminal distributions are shown for the different search engines used in the query form only if the Nter analysis opetion was checked. They show the start position of the identified peptides from the protein sequences.
+				<p>Start Position Distributions are shown for the different search engines used in the query form. They show the start positions of the identified peptides within their protein sequences.
 			</div>
 		</div>
+	</div>
+</div>
+<div id="footer">
+	<div id="path">
+		Copyright &copy; 2010 <a href="mailto:david.wedge@manchester.ac.uk">David Wedge</a> & Jennifer Siepen
 	</div>
 </div>
 </html>

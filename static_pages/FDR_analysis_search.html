@@ -7,7 +7,7 @@
  			<td> <a href="FDR_analysis_home.html"> <img width="60" height="50" alt="link to home" src="home.jpg"></a>
  			<td> <a href="FDR_analysis_search.html"> <img width="60" height="50" alt="link to search" src="search.jpg"></a>
  			<td> <a href="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl"> <img width="60" height="50" alt="link to analysis" src="analysis.jpg"></a>
- 			<td> <a href="FDR_analysis_help.html"> <img width="60" height="50" alt="link to home" src="help.jpg"></a>
+  			<td> <a href="FDR_analysis_help.html"> <img width="60" height="50" alt="link to home" src="help.jpg"></a>
  			<td> <a href="mailto:david.wedge@manchester.ac.uk"> <img width="60" height="50" alt="link to home" src="contact.jpg"></a>
 		</tr>
 	</table>
@@ -15,7 +15,8 @@
 
 <div id="main_result">
 <div id="content">
-<form name="fdr_search" action="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl?refresh=true" ENCTYPE="multipart/form-data" method="post">
+<!--form name="fdr_search" action="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl?refresh=true" ENCTYPE="multipart/form-data" method="post"-->
+<form name="fdr_search" action="../cgi-bin/FDRAnalysis/FDR_analysis_static.pl" ENCTYPE="multipart/form-data" method="post">
 	<br>
 	<h2>Parameters for the FDR Analysis</h2>
 	<br>
@@ -29,10 +30,13 @@
 			<br>
 			File type
 			<SELECT NAME="SE1"  id="textarea_border">
-			      <OPTION SELECTED>Mascot</OPTION>
-			      <OPTION>OMSSA</OPTION>
-			      <OPTION>X!Tandem</OPTION>
-			      <OPTION>Mzident</OPTION>
+			      <OPTION SELECTED>Mascot (.dat File)</OPTION>
+			      <OPTION>Mascot (.mzid File)</OPTION>
+			      <OPTION>OMSSA (.csv File)</OPTION>
+			      <OPTION>OMSSA (.mzid File)</OPTION>
+			      <OPTION>X!Tandem (.xml File)</OPTION>
+			      <OPTION>X!Tandem (.mzid File)</OPTION>
+			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
 			<br>
 			<br>
@@ -40,10 +44,13 @@
 			<br>
 			File type
 			<SELECT NAME="SE2"  id="textarea_border">
-			      <OPTION>Mascot</OPTION>
-			      <OPTION SELECTED>OMSSA</OPTION>
-			      <OPTION>X!Tandem</OPTION>
-			      <OPTION>Mzident</OPTION>
+			      <OPTION SELECTED>Mascot (.dat File)</OPTION>
+				  <OPTION>Mascot (.mzid File)</OPTION>
+				  <OPTION>OMSSA (.csv File)</OPTION>
+				  <OPTION>OMSSA (.mzid File)</OPTION>
+				  <OPTION>X!Tandem (.xml File)</OPTION>
+				  <OPTION>X!Tandem (.mzid File)</OPTION>
+			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
 			<br>
 			<br>
@@ -51,10 +58,13 @@
 			<br>
 			File type
 			<SELECT NAME="SE3"  id="textarea_border">
-			      <OPTION>Mascot</OPTION>
-			      <OPTION>OMSSA</OPTION>
-			      <OPTION SELECTED>X!Tandem</OPTION>
-			      <OPTION>Mzident</OPTION>
+			      <OPTION SELECTED>Mascot (.dat File)</OPTION>
+				  <OPTION>Mascot (.mzid File)</OPTION>
+				  <OPTION>OMSSA (.csv File)</OPTION>
+				  <OPTION>OMSSA (.mzid File)</OPTION>
+				  <OPTION>X!Tandem (.xml File)</OPTION>
+				  <OPTION>X!Tandem (.mzid File)</OPTION>
+			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
 			<br>
 			<br>
@@ -158,140 +168,140 @@
 			<br>
 			<br>
 			<SELECT NAME="fixed_mods" MULTIPLE SIZE="5" id="textarea_border">
-			      <OPTION>Acetyl (K)</OPTION>
-			      <OPTION>Acetyl (N-term)</OPTION>
-			      <OPTION>Acetyl (Protein N-term)</OPTION>
-			      <OPTION>Amidated (C-term)</OPTION>
-			      <OPTION>Amidated (Protein C-term)</OPTION>
-			      <OPTION>Ammonia-loss (N-term C)</OPTION>
-			      <OPTION>Biotin (K)</OPTION>
-			      <OPTION>Biotin (N-term)</OPTION>
-			      <OPTION>Carbamidomethyl (C)</OPTION>
-			      <OPTION>Carbamyl (K)</OPTION>
-			      <OPTION>Carbamyl (N-term)</OPTION>
-			      <OPTION>Carboxymethyl (C)</OPTION>
-			      <OPTION>Cation:Na (C-term)</OPTION>
-			      <OPTION>Cation:Na (DE)</OPTION>
-			      <OPTION>Deamidated (NQ)</OPTION>
-			      <OPTION>Dehydrated (N-term C)</OPTION>
-			      <OPTION>Dehydro (C)</OPTION>
-			      <OPTION>Dioxidation (M)</OPTION>
-			      <OPTION>Ethanolyl (C)</OPTION>
-			      <OPTION>ExacTagAmine (K)</OPTION>
-			      <OPTION>ExacTagThiol (C)</OPTION>
-			      <OPTION>Formyl (N-term)</OPTION>
-			      <OPTION>Formyl (Protein N-term)</OPTION>
-			      <OPTION>Gln-&gt;pyro-Glu (N-term Q)</OPTION>
-			      <OPTION>Glu-&gt;pyro-Glu (N-term E)</OPTION>
-			      <OPTION>Guanidinyl (K)</OPTION>
-			      <OPTION>ICAT-C (C)</OPTION>
-			      <OPTION>ICAT-C:13C(9) (C)</OPTION>
-			      <OPTION>ICPL (K)</OPTION>
-			      <OPTION>ICPL (Protein N-term)</OPTION>
-			      <OPTION>ICPL:13C(6) (K)</OPTION>
-			      <OPTION>ICPL:13C(6) (Protein N-term)</OPTION>
-			      <OPTION>ICPL:2H(4) (K)</OPTION>
-			      <OPTION>ICPL:2H(4) (Protein N-term)</OPTION>
-			      <OPTION>iTRAQ4plex (K)</OPTION>
-			      <OPTION>iTRAQ4plex (N-term)</OPTION>
-			      <OPTION>iTRAQ4plex (Y)</OPTION>
-			      <OPTION>iTRAQ8plex (K)</OPTION>
-			      <OPTION>iTRAQ8plex (N-term)</OPTION>
-			      <OPTION>iTRAQ8plex (Y)</OPTION>
-			      <OPTION>Label:18O(1) (C-term)</OPTION>
-			      <OPTION>Label:18O(2) (C-term)</OPTION>
-			      <OPTION>Met-&gt;Hse (C-term M)</OPTION>
-			      <OPTION>Met-&gt;Hsl (C-term M)</OPTION>
-			      <OPTION>Methyl (C-term)</OPTION>
-			      <OPTION>Methyl (DE)</OPTION>
-			      <OPTION>Methylthio (C)</OPTION>
-			      <OPTION>NIPCAM (C)</OPTION>
-			      <OPTION>Oxidation (HW)</OPTION>
-			      <OPTION>Oxidation (M)</OPTION>
-			      <OPTION>Phospho (ST)</OPTION>
-			      <OPTION>Phospho (Y)</OPTION>
-			      <OPTION>Propionamide (C)</OPTION>
-			      <OPTION>Pyridylethyl (C)</OPTION>
-			      <OPTION>Pyro-carbamidomethyl (N-term C)</OPTION>
-			      <OPTION>Sulfo (S)</OPTION>
-			      <OPTION>Sulfo (T)</OPTION>
-			      <OPTION>Sulfo (Y)</OPTION>
-			      <OPTION>TMT (K)</OPTION>
-			      <OPTION>TMT (N-term)</OPTION>
-			      <OPTION>TMT2plex (K)</OPTION>
-			      <OPTION>TMT2plex (N-term)</OPTION>
-			      <OPTION>TMT6plex (K)</OPTION>
-			      <OPTION>TMT6plex (N-term)</OPTION>
+			      <option value="Acetyl(K)">Acetyl(K)</option>
+				            <option value="Acetyl(N-term)">Acetyl(N-term)</option>
+				            <option value="Acetyl(ProteinN-term)">Acetyl(ProteinN-term)</option>
+				            <option value="Amidated(C-term)">Amidated(C-term)</option>
+				            <option value="Amidated(ProteinC-term)">Amidated(ProteinC-term)</option>
+				            <option value="Ammonia-loss(N-termC)">Ammonia-loss(N-termC)</option>
+				            <option value="Biotin(K)">Biotin(K)</option>
+				            <option value="Biotin(N-term)">Biotin(N-term)</option>
+				            <option value="Carbamidomethyl(C)">Carbamidomethyl(C)</option>
+				            <option value="Carbamyl(K)">Carbamyl(K)</option>
+				            <option value="Carbamyl(N-term)">Carbamyl(N-term)</option>
+				            <option value="Carboxymethyl(C)">Carboxymethyl(C)</option>
+				            <option value="Cation:Na(C-term)">Cation:Na(C-term)</option>
+				            <option value="Cation:Na(DE)">Cation:Na(DE)</option>
+				            <option value="Deamidated(NQ)">Deamidated(NQ)</option>
+				            <option value="Dehydrated(N-termC)">Dehydrated(N-termC)</option>
+				            <option value="Dehydro(C)">Dehydro(C)</option>
+				            <option value="Dioxidation(M)">Dioxidation(M)</option>
+				            <option value="Ethanolyl(C)">Ethanolyl(C)</option>
+				            <option value="ExacTagAmine(K)">ExacTagAmine(K)</option>
+				            <option value="ExacTagThiol(C)">ExacTagThiol(C)</option>
+				            <option value="Formyl(N-term)">Formyl(N-term)</option>
+				            <option value="Formyl(ProteinN-term)">Formyl(ProteinN-term)</option>
+				            <option value="Gln-&amp;t;pyro-Glu(N-termQ)">Gln-&amp;t;pyro-Glu(N-termQ)</option>
+				            <option value="Glu-&amp;t;pyro-Glu(N-termE)">Glu-&amp;t;pyro-Glu(N-termE)</option>
+				            <option value="Guanidinyl(K)">Guanidinyl(K)</option>
+				            <option value="ICAT-C(C)">ICAT-C(C)</option>
+				            <option value="ICAT-C:13C(9)(C)">ICAT-C:13C(9)(C)</option>
+				            <option value="ICPL(K)">ICPL(K)</option>
+				            <option value="ICPL(ProteinN-term)">ICPL(ProteinN-term)</option>
+				            <option value="ICPL:13C(6)(K)">ICPL:13C(6)(K)</option>
+				            <option value="ICPL:13C(6)(ProteinN-term)">ICPL:13C(6)(ProteinN-term)</option>
+				            <option value="ICPL:2H(4)(K)">ICPL:2H(4)(K)</option>
+				            <option value="ICPL:2H(4)(ProteinN-term)">ICPL:2H(4)(ProteinN-term)</option>
+				            <option value="iTRAQ4plex(K)">iTRAQ4plex(K)</option>
+				            <option value="iTRAQ4plex(N-term)">iTRAQ4plex(N-term)</option>
+				            <option value="iTRAQ4plex(Y)">iTRAQ4plex(Y)</option>
+				            <option value="iTRAQ8plex(K)">iTRAQ8plex(K)</option>
+				            <option value="iTRAQ8plex(N-term)">iTRAQ8plex(N-term)</option>
+				            <option value="iTRAQ8plex(Y)">iTRAQ8plex(Y)</option>
+				            <option value="Label:18O(1)(C-term)">Label:18O(1)(C-term)</option>
+				            <option value="Label:18O(2)(C-term)">Label:18O(2)(C-term)</option>
+				            <option value="Met-&amp;t;Hse(C-termM)">Met-&amp;t;Hse(C-termM)</option>
+				            <option value="Met-&amp;t;Hsl(C-termM)">Met-&amp;t;Hsl(C-termM)</option>
+				            <option value="Methyl(C-term)">Methyl(C-term)</option>
+				            <option value="Methyl(DE)">Methyl(DE)</option>
+				            <option value="Methylthio(C)">Methylthio(C)</option>
+				            <option value="NIPCAM(C)">NIPCAM(C)</option>
+				            <option value="Oxidation(HW)">Oxidation(HW)</option>
+				            <option value="Oxidation(M)">Oxidation(M)</option>
+				            <option value="Phospho(ST)">Phospho(ST)</option>
+				            <option value="Phospho(Y)">Phospho(Y)</option>
+				            <option value="Propionamide(C)">Propionamide(C)</option>
+				            <option value="Pyridylethyl(C)">Pyridylethyl(C)</option>
+				            <option value="Pyro-carbamidomethyl(N-termC)">Pyro-carbamidomethyl(N-termC)</option>
+				            <option value="Sulfo(S)">Sulfo(S)</option>
+				            <option value="Sulfo(T)">Sulfo(T)</option>
+				            <option value="Sulfo(Y)">Sulfo(Y)</option>
+				            <option value="TMT(K)">TMT(K)</option>
+				            <option value="TMT(N-term)">TMT(N-term)</option>
+				            <option value="TMT2plex(K)">TMT2plex(K)</option>
+				            <option value="TMT2plex(N-term)">TMT2plex(N-term)</option>
+				            <option value="TMT6plex(K)">TMT6plex(K)</option>
+          					<option value="TMT6plex(N-term)">TMT6plex(N-term)</option>
     			</SELECT>
 			Select fixed mods
 			<img height ="20" alt="Select fixed mods help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=fixed_mods','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<SELECT NAME="variable_mods" MULTIPLE SIZE="5" id="textarea_border">
-			      <OPTION>Acetyl (K)</OPTION>
-			      <OPTION>Acetyl (N-term)</OPTION>
-			      <OPTION>Acetyl (Protein N-term)</OPTION>
-			      <OPTION>Amidated (C-term)</OPTION>
-			      <OPTION>Amidated (Protein C-term)</OPTION>
-			      <OPTION>Ammonia-loss (N-term C)</OPTION>
-			      <OPTION>Biotin (K)</OPTION>
-			      <OPTION>Biotin (N-term)</OPTION>
-			      <OPTION>Carbamidomethyl (C)</OPTION>
-			      <OPTION>Carbamyl (K)</OPTION>
-			      <OPTION>Carbamyl (N-term)</OPTION>
-			      <OPTION>Carboxymethyl (C)</OPTION>
-			      <OPTION>Cation:Na (C-term)</OPTION>
-			      <OPTION>Cation:Na (DE)</OPTION>
-			      <OPTION>Deamidated (NQ)</OPTION>
-			      <OPTION>Dehydrated (N-term C)</OPTION>
-			      <OPTION>Dehydro (C)</OPTION>
-			      <OPTION>Dioxidation (M)</OPTION>
-			      <OPTION>Ethanolyl (C)</OPTION>
-			      <OPTION>ExacTagAmine (K)</OPTION>
-			      <OPTION>ExacTagThiol (C)</OPTION>
-			      <OPTION>Formyl (N-term)</OPTION>
-			      <OPTION>Formyl (Protein N-term)</OPTION>
-			      <OPTION>Gln-&gt;pyro-Glu (N-term Q)</OPTION>
-			      <OPTION>Glu-&gt;pyro-Glu (N-term E)</OPTION>
-			      <OPTION>Guanidinyl (K)</OPTION>
-			      <OPTION>ICAT-C (C)</OPTION>
-			      <OPTION>ICAT-C:13C(9) (C)</OPTION>
-			      <OPTION>ICPL (K)</OPTION>
-			      <OPTION>ICPL (Protein N-term)</OPTION>
-			      <OPTION>ICPL:13C(6) (K)</OPTION>
-			      <OPTION>ICPL:13C(6) (Protein N-term)</OPTION>
-			      <OPTION>ICPL:2H(4) (K)</OPTION>
-			      <OPTION>ICPL:2H(4) (Protein N-term)</OPTION>
-			      <OPTION>iTRAQ4plex (K)</OPTION>
-			      <OPTION>iTRAQ4plex (N-term)</OPTION>
-			      <OPTION>iTRAQ4plex (Y)</OPTION>
-			      <OPTION>iTRAQ8plex (K)</OPTION>
-			      <OPTION>iTRAQ8plex (N-term)</OPTION>
-			      <OPTION>iTRAQ8plex (Y)</OPTION>
-			      <OPTION>Label:18O(1) (C-term)</OPTION>
-			      <OPTION>Label:18O(2) (C-term)</OPTION>
-			      <OPTION>Met-&gt;Hse (C-term M)</OPTION>
-			      <OPTION>Met-&gt;Hsl (C-term M)</OPTION>
-			      <OPTION>Methyl (C-term)</OPTION>
-			      <OPTION>Methyl (DE)</OPTION>
-			      <OPTION>Methylthio (C)</OPTION>
-			      <OPTION>NIPCAM (C)</OPTION>
-			      <OPTION>Oxidation (HW)</OPTION>
-			      <OPTION>Oxidation (M)</OPTION>
-			      <OPTION>Phospho (ST)</OPTION>
-			      <OPTION>Phospho (Y)</OPTION>
-			      <OPTION>Propionamide (C)</OPTION>
-			      <OPTION>Pyridylethyl (C)</OPTION>
-			      <OPTION>Pyro-carbamidomethyl (N-term C)</OPTION>
-			      <OPTION>Sulfo (S)</OPTION>
-			      <OPTION>Sulfo (T)</OPTION>
-			      <OPTION>Sulfo (Y)</OPTION>
-			      <OPTION>TMT (K)</OPTION>
-			      <OPTION>TMT (N-term)</OPTION>
-			      <OPTION>TMT2plex (K)</OPTION>
-			      <OPTION>TMT2plex (N-term)</OPTION>
-			      <OPTION>TMT6plex (K)</OPTION>
-			      <OPTION>TMT6plex (N-term)</OPTION>
+			      <option value="Acetyl(K)">Acetyl(K)</option>
+				            <option value="Acetyl(N-term)">Acetyl(N-term)</option>
+				            <option value="Acetyl(ProteinN-term)">Acetyl(ProteinN-term)</option>
+				            <option value="Amidated(C-term)">Amidated(C-term)</option>
+				            <option value="Amidated(ProteinC-term)">Amidated(ProteinC-term)</option>
+				            <option value="Ammonia-loss(N-termC)">Ammonia-loss(N-termC)</option>
+				            <option value="Biotin(K)">Biotin(K)</option>
+				            <option value="Biotin(N-term)">Biotin(N-term)</option>
+				            <option value="Carbamidomethyl(C)">Carbamidomethyl(C)</option>
+				            <option value="Carbamyl(K)">Carbamyl(K)</option>
+				            <option value="Carbamyl(N-term)">Carbamyl(N-term)</option>
+				            <option value="Carboxymethyl(C)">Carboxymethyl(C)</option>
+				            <option value="Cation:Na(C-term)">Cation:Na(C-term)</option>
+				            <option value="Cation:Na(DE)">Cation:Na(DE)</option>
+				            <option value="Deamidated(NQ)">Deamidated(NQ)</option>
+				            <option value="Dehydrated(N-termC)">Dehydrated(N-termC)</option>
+				            <option value="Dehydro(C)">Dehydro(C)</option>
+				            <option value="Dioxidation(M)">Dioxidation(M)</option>
+				            <option value="Ethanolyl(C)">Ethanolyl(C)</option>
+				            <option value="ExacTagAmine(K)">ExacTagAmine(K)</option>
+				            <option value="ExacTagThiol(C)">ExacTagThiol(C)</option>
+				            <option value="Formyl(N-term)">Formyl(N-term)</option>
+				            <option value="Formyl(ProteinN-term)">Formyl(ProteinN-term)</option>
+				            <option value="Gln-&amp;t;pyro-Glu(N-termQ)">Gln-&amp;t;pyro-Glu(N-termQ)</option>
+				            <option value="Glu-&amp;t;pyro-Glu(N-termE)">Glu-&amp;t;pyro-Glu(N-termE)</option>
+				            <option value="Guanidinyl(K)">Guanidinyl(K)</option>
+				            <option value="ICAT-C(C)">ICAT-C(C)</option>
+				            <option value="ICAT-C:13C(9)(C)">ICAT-C:13C(9)(C)</option>
+				            <option value="ICPL(K)">ICPL(K)</option>
+				            <option value="ICPL(ProteinN-term)">ICPL(ProteinN-term)</option>
+				            <option value="ICPL:13C(6)(K)">ICPL:13C(6)(K)</option>
+				            <option value="ICPL:13C(6)(ProteinN-term)">ICPL:13C(6)(ProteinN-term)</option>
+				            <option value="ICPL:2H(4)(K)">ICPL:2H(4)(K)</option>
+				            <option value="ICPL:2H(4)(ProteinN-term)">ICPL:2H(4)(ProteinN-term)</option>
+				            <option value="iTRAQ4plex(K)">iTRAQ4plex(K)</option>
+				            <option value="iTRAQ4plex(N-term)">iTRAQ4plex(N-term)</option>
+				            <option value="iTRAQ4plex(Y)">iTRAQ4plex(Y)</option>
+				            <option value="iTRAQ8plex(K)">iTRAQ8plex(K)</option>
+				            <option value="iTRAQ8plex(N-term)">iTRAQ8plex(N-term)</option>
+				            <option value="iTRAQ8plex(Y)">iTRAQ8plex(Y)</option>
+				            <option value="Label:18O(1)(C-term)">Label:18O(1)(C-term)</option>
+				            <option value="Label:18O(2)(C-term)">Label:18O(2)(C-term)</option>
+				            <option value="Met-&amp;t;Hse(C-termM)">Met-&amp;t;Hse(C-termM)</option>
+				            <option value="Met-&amp;t;Hsl(C-termM)">Met-&amp;t;Hsl(C-termM)</option>
+				            <option value="Methyl(C-term)">Methyl(C-term)</option>
+				            <option value="Methyl(DE)">Methyl(DE)</option>
+				            <option value="Methylthio(C)">Methylthio(C)</option>
+				            <option value="NIPCAM(C)">NIPCAM(C)</option>
+				            <option value="Oxidation(HW)">Oxidation(HW)</option>
+				            <option value="Oxidation(M)">Oxidation(M)</option>
+				            <option value="Phospho(ST)">Phospho(ST)</option>
+				            <option value="Phospho(Y)">Phospho(Y)</option>
+				            <option value="Propionamide(C)">Propionamide(C)</option>
+				            <option value="Pyridylethyl(C)">Pyridylethyl(C)</option>
+				            <option value="Pyro-carbamidomethyl(N-termC)">Pyro-carbamidomethyl(N-termC)</option>
+				            <option value="Sulfo(S)">Sulfo(S)</option>
+				            <option value="Sulfo(T)">Sulfo(T)</option>
+				            <option value="Sulfo(Y)">Sulfo(Y)</option>
+				            <option value="TMT(K)">TMT(K)</option>
+				            <option value="TMT(N-term)">TMT(N-term)</option>
+				            <option value="TMT2plex(K)">TMT2plex(K)</option>
+				            <option value="TMT2plex(N-term)">TMT2plex(N-term)</option>
+				            <option value="TMT6plex(K)">TMT6plex(K)</option>
+          					<option value="TMT6plex(N-term)">TMT6plex(N-term)</option>
     			</SELECT>
 				Select variable mods
 				<img height ="20" alt="Select variable mods help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=variable_mods','helpwindow','width=450,height=250');">
@@ -301,5 +311,10 @@
 	</div>
 </form>
 </div>
+</div>
+<div id="footer">
+	<div id="path">
+		Copyright &copy; 2010 <a href="mailto:david.wedge@manchester.ac.uk">David Wedge</a> & Jennifer Siepen
+	</div>
 </div>
 </html>

@@ -47,6 +47,8 @@ sub ZoomScoreDistribution
 	my $min=1000;
 	my $max = 0;
 
+	my $binWidth = 5;
+
 	my $engine;
 	if($setype eq "M")
 	{
@@ -59,6 +61,11 @@ sub ZoomScoreDistribution
 	elsif($setype eq "T")
 	{
 		$engine = "XTandem";
+	}
+	elsif($setype eq "C")
+	{
+		$engine = "Consensus";
+		$binWidth = 0.1;
 	}
 
 	for(my $r=1 ; $r<scalar(@results) ; $r++)
@@ -85,17 +92,21 @@ sub ZoomScoreDistribution
 					$disc = $score;
 				}
 
-				if($setype ne "O")
-				{
-					$disc = int($disc);
-				}
-				else
+				if($setype eq "O")
 				{
 					#DCW - 211209
 					$disc = $results[$r][$rank]{'expect'};
 					#$disc = -10*log($disc)/log(10);#convert e-value to score
 					$disc = -log($disc);#convert e-value to score
 					$disc = sprintf("%.1f",$disc);
+				}
+				elsif($setype eq "C")
+				{
+					$disc = $results[$r][$rank]{'FDR_score'};
+				}
+				else
+				{
+					$disc = int($disc);
 				}
 
 				my $rev = 0;
@@ -120,19 +131,26 @@ sub ZoomScoreDistribution
 	}
 
 	#put the distribution into bins
-	my $binWidth = 5;
 	my @totals;
 	foreach my $score (keys %distribution)
 	{
 		my $newscore;
-		if($score<0)
+		if($binWidth>=1)#condition added 030310
 		{
-			$newscore =  -int(-$score/$binWidth+0.5) * $binWidth;
+			if($score<0)
+			{
+				$newscore =  -int(-$score/$binWidth+0.5) * $binWidth;
+			}
+			else
+			{
+				$newscore =  int($score/$binWidth+0.5) * $binWidth;
+			}
 		}
 		else
 		{
-			$newscore =  int($score/$binWidth+0.5) * $binWidth;
+			$newscore = sprintf("%.1f",$score);
 		}
+
 		if($newscore>$max)
 		{
 			$max = $newscore;
@@ -166,17 +184,35 @@ sub ZoomScoreDistribution
 	$min = $min-$binWidth;
 	$max = $max+$binWidth;
 
+	if($setype eq "C")
+	{
+		$min = 0.0;
+		$max = 1.0;
+	}
+
 	my %plotdata;
 	my @scorearray;
 	#add points with zero value
-	for(my $i = $min; $i<=$max; $i += $binWidth)
+	if($binWidth>=1)#condition added 020310
 	{
-		$plotdata{$i}[0] = $i;
-		$plotdata{$i}[1] = 0;
-		$plotdata{$i}[2] = 0;
-		push(@scorearray,$i);
+		for(my $i = $min; $i<=$max; $i += $binWidth)
+		{
+			$plotdata{$i}[0] = $i;
+			$plotdata{$i}[1] = 0;
+			$plotdata{$i}[2] = 0;
+			push(@scorearray,$i);
+		}
 	}
-
+	else
+	{
+		for(my $i=int($min*10);$i<=int($max*10);$i++)
+		{
+			$plotdata{$i/10.0}[0] = $i/10.0;
+			$plotdata{$i/10.0}[1] = 0;
+			$plotdata{$i/10.0}[2] = 0;
+			push(@scorearray,$i/10.0);
+		}
+	}
 
 	foreach my $score (keys %tmpdistribution)
 	{
@@ -185,6 +221,7 @@ sub ZoomScoreDistribution
    		{
  			#this will be the estimated correct
 			my $estimatedCorrect = $tmpdistribution{$score}[0]-$tmpdistribution{$score}[1];
+			#print("score=".$score."est correct=".$estimatedCorrect."\n");
 			#DCW - don't use values less than zero
 			if($estimatedCorrect > 0)
 			{
@@ -197,11 +234,12 @@ sub ZoomScoreDistribution
 		}
 		elsif($tmpdistribution{$score}[0])
 		{
+			#print("score=".$score."forward dist=".$tmpdistribution{$score}[0]."\n");
 			$plotdata{$score}[1] = $tmpdistribution{$score}[0];
 		}
 		if($tmpdistribution{$score}[1])
 		{
-			#and the estimated incorrect
+			#print("score=".$score."decoy dist=".$tmpdistribution{$score}[0]."\n");
 			$plotdata{$score}[2] = $tmpdistribution{$score}[1];
 		}
 	}
@@ -221,15 +259,23 @@ sub ZoomScoreDistribution
 		$count++;
 	}
 
-	if($setype ne "O")
-	{
-		#$scoretype .= " score";
-		$scoretype = "score";
-	}
-	else
+	if($setype eq "O")
 	{
 		#$scoretype = "-10log(expect)";
 		$scoretype = "-log(expect)";
+	}
+	elsif($setype eq "C")
+	{
+		$scoretype = "FDR";
+	}
+	elsif($setype eq "T")
+	{
+		$scoretype = "hyperscore";
+	}
+	else
+	{
+		#$scoretype .= " score";
+		$scoretype = "score";
 	}
 
 	my $title = $engine . " Estimation of Correct/Incorrect";
