@@ -36,7 +36,8 @@ use strict;
 
 my $width="450";
 my $height="300";
-my $fontpath = "/usr/share/fonts/truetype/comic.ttf";
+#my $fontpath = "/usr/share/fonts/truetype/comic.ttf";
+my $fontpath = "['comic', 'verdana', 'arial', gdMediumFont]";
 my $x_max;
 my $x_min;#DCW 150110
 
