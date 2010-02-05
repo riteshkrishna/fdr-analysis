@@ -27,6 +27,7 @@
 		<br>
 		<div innerbox align=left>
 			File 1: <input type="file" name="input1" id="textarea_border" size="50"/>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=input_files','helpwindow','width=450,height=250');">
 			<br>
 			File type
 			<SELECT NAME="SE1"  id="textarea_border">
@@ -38,9 +39,11 @@
 			      <OPTION>X!Tandem (.mzid File)</OPTION>
 			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=file_types','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			File 2: <input type="file" name="input2" id="textarea_border" size="50"/>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=input_files','helpwindow','width=450,height=250');">
 			<br>
 			File type
 			<SELECT NAME="SE2"  id="textarea_border">
@@ -52,9 +55,11 @@
 				  <OPTION>X!Tandem (.mzid File)</OPTION>
 			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=file_types','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			File 3: <input type="file" name="input3" id="textarea_border" size="50"/>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=input_files','helpwindow','width=450,height=250');">
 			<br>
 			File type
 			<SELECT NAME="SE3"  id="textarea_border">
@@ -66,11 +71,21 @@
 				  <OPTION>X!Tandem (.mzid File)</OPTION>
 			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
+			<img height ="20" alt="Input files help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=file_types','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<br>
 			<input type="text" name="rev_tag" value="REV_" id="textarea_border" size="5">   Tag used in Decoy search
 			<img height ="20" alt="Decoy tag help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=decoy_tag','helpwindow','width=450,height=250');">
+			<br>
+			<br>
+			I would like to:
+			<br>
+			<input type="radio" name="result_access" value="wait" checked/> wait for my results.
+			<br>
+			<input type="radio" name="result_access" value="email" /> receive an email when my results are ready. My email address is:
+			<br>
+			<input type="text" name="email" id="textarea_border" size="50">
 			<br>
 			<br>
 		</div>
@@ -99,7 +114,8 @@
 			<input type="checkbox" name="combine" id="textarea_border" checked>   Combine results from different search engines
 			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
 			<br>
-			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  If using an oversized decoy enter size increase here (specific to combined analysis)
+			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  The size of the decoy database relative to the target database
+			<img height ="20" alt="Decoy ratio help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=decoy_ratio','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<input type="hidden" name="refresh" value="true">
@@ -126,6 +142,7 @@
 				<option value="Da">Da
 				<option value="ppm">ppm
 			</select>
+			<img height ="20" alt="Tolerance help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=tolerance','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			Fragment mass type:
@@ -139,6 +156,7 @@
 				<option value="Da">Da
 				<option value="ppm">ppm
 			</select>
+			<img height ="20" alt="Tolerance help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=tolerance','helpwindow','width=450,height=250');">
 			<br>
 			<br>
 			<SELECT NAME="enzyme"  id="textarea_border">
