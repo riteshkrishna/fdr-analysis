@@ -52,11 +52,12 @@
 				<a name= "analysis"><p>Analysis Details</a>
 			</div>
 			<div id="innerbox" align="left">
-				<p><b>N terminal analysis</b> If checked, the analysis will include an N-terminal analysis, which will determine the number of identifications that are the N-terminal most peptide of the protein (based on the start position reported by each of the different search engines).
-				<p><b>Decoy tag</b> This is the 'tag' used to mark the proteins which are decoys. For example, if the target database has a protein with accession number >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'.
-				<p><b>Combine Results</b> This employs the algorithm described in <i>Jones et al. Proteomics (2009) 9: 1220-9</i> to combine the results of two or more searches from the different search engines.  This search can take a few extra minutes (depending on file sizes), so please be patient.
+				<p><b>N terminal analysis</b> If the N-terminal analysis box is checked, the analysis will include an N-terminal analysis, which will determine the number of identifications that are the N-terminal most peptide of the protein (based on the start position reported by each of the different search engines).
+				<p><b>Decoy tag</b> This is the 'tag' used to mark the proteins which are decoys. For example, if the target database has a protein with accession number >P12345 and the equivalent decoy protein is >REVERSE_P12345 then the tag is 'REVERSE_'. It is very important for the FDR calculations that this tag is entered correctly.
+				<p><b>Combine Results</b> If 'combine results' is true, the algorithm described in <i>Jones et al. Proteomics (2009) 9: 1220-9</i> is employed to combine the results of two or more searches from the different search engines.  This search can take a few extra minutes (depending on file sizes), so please be patient.
 				<p><b>Maximum Expectation Value</b> The maximum expectation value determines which identifications will be included in the rank plot and start position plot.
 				<p><b>FDR rate</b> Results will be reported up to the false discovery rate (FDR) entered here.
+				<p><b>Decoy size</b> This is the size of the decoy database, relative to the target database. If the 2 databases are of equal size this value should be 1. It is important for the FDR calculations that this value is entered is correctly.
 			</div>
 			<div id="innerboxheader">
 				<a name="file_upload"><p>File Upload</a>
