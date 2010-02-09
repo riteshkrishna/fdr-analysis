@@ -542,13 +542,15 @@ sub main_content()
 				#my $combinedlist = $webpath."tmp/".$session->id . "combined_peptides.out";
 				my $combinedlist = $new_peptideOutput;#DCW - temporary fix, download peptideOutput
 				$blurb .=  "<BR><P>To download a list of identified peptides from the combined analysis please click <a href=\"$combinedlist\" target=\"top\">here</a><BR>";
-				my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$session->id.".mzid";
-				my $newProtAmbigFile = $out_protGroupMzId;
-				$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
-				$cmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
-				system($cmd);
-				$newProtAmbigFile =~ s/$local_webpath/$path_to_tmp/;
-				$blurb .=  "<BR><P>To download a protein ambiguity file in mzident format from the combined analysis please click <a href=\"$newProtAmbigFile\" target=\"top\">here</a><BR>";
+				#my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$session->id.".mzid";
+				#my $newProtAmbigFile = $out_protGroupMzId;
+				my $newProtAmbigFile = $local_dir."FinalProtAmbg_".$session->id.".mzid";
+				#$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
+				#$cmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
+				#system($cmd);
+				#$newProtAmbigFile =~ s/$local_webpath/$path_to_tmp/;
+				$newProtAmbigFile =~ s/$local_dir/$path_to_tmp/;
+				$blurb .=  "<BR><P>To download results from the combined analysis in mzident format please click <a href=\"$newProtAmbigFile\" target=\"top\">here</a><BR>";
 			}
 
 			$title = "Results Summary";
@@ -1115,7 +1117,8 @@ sub RunAnalysis
 	
 	#chdir("web-based-multiplesearch\\src\\Parsers"); # change directory to where the parser source code is...
 	print SHELL "cd ".$local_cgibin."Parsers"."\n";
-	my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp";	
+	#my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp";
+	my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp -protein_grouping";
 	print PARAM "\n\n $parseCmd";
 	print SHELL $parseCmd."\n";
 	#system($parseCmd);
@@ -1129,7 +1132,12 @@ sub RunAnalysis
 	my $finalCmd = "perl testcode.pl $out_csvForMzId $out_protGroupTemp $out_protGroupMzId";
 	print PARAM "\n\n $finalCmd";
 	#system($finalCmd);  #DCW - commented out
-	print SHELL $finalCmd."\n";    
+	print SHELL $finalCmd."\n"; 
+
+	my $newProtAmbigFile = $out_protGroupMzId;
+	$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
+	my $copycmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
+	print SHELL $copycmd."\n";
 
 	if($email_cmd)
 	{
@@ -1343,7 +1351,7 @@ sub createParamFileForParsers
 	$infoFromWebPage{'parentToleranceMinus'}   = $session->param("parent_tolerance"); 
 	$infoFromWebPage{'databaseFileFormat'}     = "No File";
 	$infoFromWebPage{'databaseFileComposition'}= "No File"; 
-	$infoFromWebPage{'decoyString'}            = $cgi->param("rev_tag");	
+	$infoFromWebPage{'decoyString'}            = $cgi->param("rev_tag");
 
 	my @fixedModFromWeb = $cgi->param("fixed_mods");
 	my @varModsFromWeb  = $cgi->param("variable_mods");

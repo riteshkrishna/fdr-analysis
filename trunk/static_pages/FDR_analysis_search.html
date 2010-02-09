@@ -47,9 +47,9 @@
 			<br>
 			File type
 			<SELECT NAME="SE2"  id="textarea_border">
-			      <OPTION SELECTED>Mascot (.dat File)</OPTION>
+			      <OPTION>Mascot (.dat File)</OPTION>
 				  <OPTION>Mascot (.mzid File)</OPTION>
-				  <OPTION>OMSSA (.csv File)</OPTION>
+				  <OPTION SELECTED>OMSSA (.csv File)</OPTION>
 				  <OPTION>OMSSA (.mzid File)</OPTION>
 				  <OPTION>X!Tandem (.xml File)</OPTION>
 				  <OPTION>X!Tandem (.mzid File)</OPTION>
@@ -63,11 +63,11 @@
 			<br>
 			File type
 			<SELECT NAME="SE3"  id="textarea_border">
-			      <OPTION SELECTED>Mascot (.dat File)</OPTION>
+			      <OPTION>Mascot (.dat File)</OPTION>
 				  <OPTION>Mascot (.mzid File)</OPTION>
 				  <OPTION>OMSSA (.csv File)</OPTION>
 				  <OPTION>OMSSA (.mzid File)</OPTION>
-				  <OPTION>X!Tandem (.xml File)</OPTION>
+				  <OPTION SELECTED>X!Tandem (.xml File)</OPTION>
 				  <OPTION>X!Tandem (.mzid File)</OPTION>
 			      <!-- <OPTION>Mzident</OPTION> -->
 			</SELECT>
@@ -100,10 +100,10 @@
 			The options in this section allow you to tune the analysis to your dataset and search characteristics.
 			<br>
 			<br>
-			 <input type="checkbox" name='nter' id="textarea_border">  Include N terminal analysis
+			 <input type="checkbox" name='nter' id="textarea_border" checked>  Include N terminal analysis
 			<img height ="20" alt="N-terminal help" src ="help.jpg"  onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');">
 			<br>
-			<input type="text" name="max_expect" value="0.05" id="textarea_border" size="5">   Maximum expectation value to use for the Rank plot
+			<input type="text" name="max_expect" value="0.05" id="textarea_border" size="5">   Maximum expectation value to use for the Rank and Start Position plots
 			<img height ="20" alt="Expectation value help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=expectation_value','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="fdr_value" value="0.05" id="textarea_border" size="5">   FDR rate
