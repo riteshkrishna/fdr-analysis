@@ -103,16 +103,19 @@
 			 <input type="checkbox" name='nter' id="textarea_border" checked>  Include N terminal analysis
 			<img height ="20" alt="N-terminal help" src ="help.jpg"  onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=N_terminal_analysis','helpwindow','width=450,height=250');">
 			<br>
+			<input type="checkbox" name="combine" id="textarea_border" checked>   Combine results from different search engines
+			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
+			<br>
+			<input type="checkbox" name="graphics_on" id="textarea_border" checked>   Produce graphs
+			<img height ="20" alt="Graphics help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=graphics','helpwindow','width=450,height=250');">
+			<br>
+			<br>
 			<input type="text" name="max_expect" value="0.05" id="textarea_border" size="5">   Maximum expectation value to use for the Rank and Start Position plots
 			<img height ="20" alt="Expectation value help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=expectation_value','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="fdr_value" value="0.05" id="textarea_border" size="5">   FDR rate
 			<input type="hidden" name="analysis_type">
 			<img height ="20" alt="FDR help" src ="help.jpg", onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=FDR','helpwindow','width=450,height=250');">
-			<br>
-			<br>
-			<input type="checkbox" name="combine" id="textarea_border" checked>   Combine results from different search engines
-			<img height ="20" alt="Combine results help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=combine_results','helpwindow','width=450,height=250');">
 			<br>
 			<input type="text" name="oversize" id="textarea_border" value="1" size="2">  The size of the decoy database relative to the target database
 			<img height ="20" alt="Decoy ratio help" src ="help.jpg" onclick ="window.open('../cgi-bin/FDRAnalysis/help_page.pl?content=decoy_ratio','helpwindow','width=450,height=250');">
