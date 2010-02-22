@@ -133,6 +133,9 @@ sub main_content()
 		$file3=$cgi->param("input3");
 		$combine_param = $cgi->param("combine");
 		$session->param("combine", $combine_param);#260110
+		my $graphics = $cgi->param("graphics_on");#160210
+		#print("<br>refreshing. graphics= $graphics  combine= $combine_param <br>");
+		$session->param("graphics", $graphics);#160210
 		$session->param("paramsset",0);
 		$session->param("nterminal", $cgi->param("nter"));
 
@@ -171,22 +174,23 @@ sub main_content()
 		$FDR_image_file[0] = $local_webpath . $session->id . "_se1_fdranalysis" . ".png";
 		if($refresh eq "true")
 		{
-			my $tmp = $FDR_image_file[0];
-			$tmp =~ s/\.png/GygiRank\.png/;
- 			if(-e $tmp)
-			{
+			#my $tmp = $FDR_image_file[0];
+			#$tmp =~ s/\.png/GygiRank\.png/;
+ 			#if(-e $tmp)
+			#{
 				#REMOVE IMAGE FILE
-				my $cmd = "rm $tmp";
-				system($cmd);
-			}
+			#	my $cmd = "rm $tmp";
+			#	system($cmd);
+			#}
 		}
 		else
 		{
 			my $tmp = $FDR_image_file[0];
 			$tmp =~ s/\.png/GygiRank\.png/;
 			#("GYGI RANK FILE: ".$tmp."<br>");
- 			if(!-e $tmp)
+ 			if($session->param("graphics") && !-e $tmp)
  			{
+				#print("<br>graphics file 1 not ready<br>");
  				$results_ready = 0;
 				$refresh_browser = "true";
 			}
@@ -206,21 +210,22 @@ sub main_content()
 		$FDR_image_file[1] = $local_webpath . $session->id . "_se2_fdranalysis" . ".png";
 		if($refresh eq "true")
 		{
-			my $tmp = $FDR_image_file[1];
-			$tmp =~ s/\.png/GygiRank\.png/;
- 			if(-e $tmp)
-			{
+			#my $tmp = $FDR_image_file[1];
+			#$tmp =~ s/\.png/GygiRank\.png/;
+ 			#if(-e $tmp)
+			#{
 				#REMOVE IMAGE FILE
-				my $cmd = "rm $tmp";
-				system($cmd);
-			}
+				#my $cmd = "rm $tmp";
+				#system($cmd);
+			#}
 		}
 		else
 		{
 			my $tmp = $FDR_image_file[1];
 			$tmp =~ s/\.png/GygiRank\.png/;
- 			if(!-e $tmp)
+ 			if($session->param("graphics") && !-e $tmp)
  			{
+				#print("<br>graphics file 2 not ready<br>");
  				$results_ready = 0;
 				$refresh_browser = "true";
 			}
@@ -240,21 +245,22 @@ sub main_content()
 		$FDR_image_file[2] = $local_webpath . $session->id . "_se3_fdranalysis" . ".png";
 		if($refresh eq "true")
 		{
-			my $tmp = $FDR_image_file[2];
-			$tmp =~ s/\.png/GygiRank\.png/;
- 			if(-e $tmp)
-			{
+			#my $tmp = $FDR_image_file[2];
+			#$tmp =~ s/\.png/GygiRank\.png/;
+ 			#if(-e $tmp)
+			#{
 				#REMOVE IMAGE FILE
-				my $cmd = "rm $tmp";
-				system($cmd);
-			}
+			#	my $cmd = "rm $tmp";
+			#	system($cmd);
+			#}
 		}
 		else
 		{
 			my $tmp = $FDR_image_file[2];
 			$tmp =~ s/\.png/GygiRank\.png/;
- 			if(!-e $tmp)
+ 			if($session->param("graphics") && !-e $tmp)
  			{
+				#print("<br>graphics file 3 not ready<br>");
  				$results_ready = 0;
 				$refresh_browser = "true";
 			}
@@ -276,6 +282,7 @@ sub main_content()
 	}
    	elsif(!-e $summary_file)
    	{
+		#print("<br>summary file not ready<br>");
 		$results_ready = 0;
    		$refresh_browser = "true";
   	}
@@ -308,7 +315,7 @@ sub main_content()
 	
 	if(!$session->param("paramsset"))
 	{
-		#print "setting params\n";
+		#print "<br>setting params<br>";
 
 		#moved to here 091209
 		if(!$session->param("se3") && !$session->param("se2") && !$session->param("se1"))
@@ -443,8 +450,8 @@ sub main_content()
 	{
 		#$session->param("result_access","wait");
 
-		#InfoMsg("A download link will be emailed to you once the analysis is complete.\n");
-		InfoMsg("A download link has been emailed to you.\n");
+		InfoMsg("A download link will be emailed to you once the analysis is complete.\n");
+		#InfoMsg("A download link has been emailed to you.\n");
 		#backButton();
 		#exit(1);
 		exit(0);
@@ -480,6 +487,9 @@ sub main_content()
 				$session->flush();
 			}
 		}
+		#my $delcmd="qacct -j  242482";
+		#system($delcmd);
+		system("qstat\n");
 
 		print  $cgi->div({id=>"main_result"},
 			$cgi->div({id=>"content"},
@@ -539,16 +549,9 @@ sub main_content()
 
 			if($session->param("combine") == 1)
 			{
-				#my $combinedlist = $webpath."tmp/".$session->id . "combined_peptides.out";
 				my $combinedlist = $new_peptideOutput;#DCW - temporary fix, download peptideOutput
 				$blurb .=  "<BR><P>To download a list of identified peptides from the combined analysis please click <a href=\"$combinedlist\" target=\"top\">here</a><BR>";
-				#my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$session->id.".mzid";
-				#my $newProtAmbigFile = $out_protGroupMzId;
 				my $newProtAmbigFile = $local_dir."FinalProtAmbg_".$session->id.".mzid";
-				#$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
-				#$cmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
-				#system($cmd);
-				#$newProtAmbigFile =~ s/$local_webpath/$path_to_tmp/;
 				$newProtAmbigFile =~ s/$local_dir/$path_to_tmp/;
 				$blurb .=  "<BR><P>To download results from the combined analysis in mzident format please click <a href=\"$newProtAmbigFile\" target=\"top\">here</a><BR>";
 			}
@@ -650,45 +653,83 @@ sub main_content()
 			$title = "Overlap of Peptides from different search engines";
 		}
 
-		print  $cgi->div({id=>"main_result"},
+		if($session->param("graphics"))
+		{
+			print  $cgi->div({id=>"main_result"},
 				$cgi->div({id=>"content"},
-				$cgi->br(),
-				$cgi->h2($title),
- 				$cgi->br(),
-				$cgi->table(
-					$cgi->Tr(
-						$cgi->td({valign=>"top"},
-						$cgi->div({id=>"nav"},
-                                   		$cgi->table(
-								$cgi->th($cgi->p("Select display format")),
-                                          		$cgi->Tr( 
-									$cgi->td(
-										$cgi->ul(
-                                							$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=summary"},"Summary")),
-											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=combined"},"Peptide Overlap")),
-											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=rankplot"},"Rank plot")),
-                               							$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=deltamass"},"Delta Mass")),
-                                							$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=scoredist"},"Score Distribution")),
-                                							#$nterminal,
-											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=nterdist"},"Start Position Distribution")),
-											$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=zoomscore"},"Estimated Correct/Incorrect"))
+					$cgi->br(),
+					$cgi->h2($title),
+ 					$cgi->br(),
+					$cgi->table(
+						$cgi->Tr(
+							$cgi->td({valign=>"top"},
+								$cgi->div({id=>"nav"},
+              	                     			$cgi->table(
+										$cgi->th($cgi->p("Select display format")),
+              	                            			$cgi->Tr( 
+											$cgi->td(
+												$cgi->ul(
+              	                  								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=summary"},"Summary")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=combined"},"Peptide Overlap")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=rankplot"},"Rank plot")),
+              	                 								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=deltamass"},"Delta Mass")),
+              	                  								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=scoredist"},"Score Distribution")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=nterdist"},"Start Position Distribution")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=zoomscore"},"Estimated Correct/Incorrect"))
+												)
+											)
 										)
 									)
 								)
+							),
+              	              		$cgi->td(
+								$cgi->p($blurb)
 							)
-						)
-					),
-                            	$cgi->td(
-						$cgi->p($blurb)
-						)
-					),
-					$cgi->Tr(
-						$cgi->td($cgi->br()),
-						$cgi->td($final_image_line)
-                			)
+						),
+						$cgi->Tr(
+							$cgi->td($cgi->br()),
+							$cgi->td($final_image_line)
+                				)
+					)
 				)
-			)
-		);
+			);
+		}
+		else
+		{
+			print  $cgi->div({id=>"main_result"},
+				$cgi->div({id=>"content"},
+					$cgi->br(),
+					$cgi->h2($title),
+ 					$cgi->br(),
+					$cgi->table(
+						$cgi->Tr(
+							$cgi->td({valign=>"top"},
+								$cgi->div({id=>"nav"},
+              	                     			$cgi->table(
+										$cgi->th($cgi->p("Select display format")),
+              	                            			$cgi->Tr( 
+											$cgi->td(
+												$cgi->ul(
+              	                  								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=summary"},"Summary")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=combined"},"Peptide Overlap")),
+												)
+											)
+										)
+									)
+								)
+							),
+              	              		$cgi->td(
+								$cgi->p($blurb)
+							)
+						),
+						$cgi->Tr(
+							$cgi->td($cgi->br()),
+							$cgi->td($final_image_line)
+                				)
+					)
+				)
+			);
+		}
 	}
 	#backButton();
 }
@@ -701,8 +742,6 @@ sub backButton()
 			$cgi->br(),
 			$cgi->start_form(-name=>'fdr_search',-action=>$webpath."FDR_analysis_search.html", -method=>"post"),
 			$cgi->submit(-value=>"New Analysis", id=>'textarea_border'),
-			#$cgi->input({-type=>"hidden", -name=>"submit_clicked"}),
-			#$cgi->input({-type=>"hidden", -name=>"result_view"}),
 			$cgi->end_form(),
 			$cgi->br()
 		)
@@ -833,7 +872,7 @@ sub RunAnalysis
 
 	# testing the code...for param file creation...
 	my $omssaParamFileName = createParamFileForParsers();
-
+	my $tandemParamFileName = $local_cgibin."Parsers/example_tandem_params.csv";
 
 	$shell = $shelldir."RunFDRAnalysis_" . $session->id . ".sh";
 
@@ -843,7 +882,7 @@ sub RunAnalysis
 
 	# If any of the files are not in MzIdentML format, call the parser
 	#if(($file1_type ne 'Mzident')|| ($file2_type ne 'Mzident') ||($file1_type ne 'Mzident')){
-		callTheMzIdentMLParser($file_Upload1,$file1_type,$file_Upload2,$file2_type,$file_Upload3,$file3_type,$omssaParamFileName);
+		callTheMzIdentMLParser($file_Upload1,$file1_type,$file_Upload2,$file2_type,$file_Upload3,$file3_type,$omssaParamFileName,$tandemParamFileName);
 	#}	
 	
 
@@ -964,7 +1003,7 @@ sub RunAnalysis
 	#system($cmd);         
 	#chdir($currentWorkdir); # come back to the original directory
 
-	#my $delcmd="qdel 239784";
+	#my $delcmd="qdel 242444";
 	#system($delcmd);
 	#$delcmd="qdel 239732";
 	#system($delcmd);
@@ -1046,32 +1085,35 @@ sub RunAnalysis
 		}
 	}
 
-	print SHELL "cd ".$local_cgibin."\n";
-	print SHELL "perl WriteStatus.pl -F $statusFile -T Producing_Graphics\n";
-	print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
+	if($session->param("graphics"))
+	{
+		print SHELL "cd ".$local_cgibin."\n";
+		print SHELL "perl WriteStatus.pl -F $statusFile -T Producing_Graphics\n";
+		print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
 
-	my $expect = $session->param('max_expect');
-	if($mascot_file)
-	{
-		$cmd = "perl RunGraphics.pl -F $mascot_file -S mascot -G $mascot_graphics_file -R $revString -M $expect -D $decoySize\n";
-		print SHELL $cmd;
-	}
-	if($omssa_file)
-	{
-		$cmd = "perl RunGraphics.pl -F $omssa_file -S omssa -G $omssa_graphics_file -R $revString -M $expect -D $decoySize\n";
-		print SHELL $cmd;
-	}
-	if($tandem_file)
-	{
-		$cmd = "perl RunGraphics.pl -F $tandem_file -S X!Tandem -G $tandem_graphics_file -R $revString -M $expect -D $decoySize\n";
-		print SHELL $cmd;
-	}
+		my $expect = $session->param('max_expect');
+		if($mascot_file)
+		{
+			$cmd = "perl RunGraphics.pl -F $mascot_file -S mascot -G $mascot_graphics_file -R $revString -M $expect -D $decoySize\n";
+			print SHELL $cmd;
+		}
+		if($omssa_file)
+		{
+			$cmd = "perl RunGraphics.pl -F $omssa_file -S omssa -G $omssa_graphics_file -R $revString -M $expect -D $decoySize\n";
+			print SHELL $cmd;
+		}
+		if($tandem_file)
+		{
+			$cmd = "perl RunGraphics.pl -F $tandem_file -S X!Tandem -G $tandem_graphics_file -R $revString -M $expect -D $decoySize\n";
+			print SHELL $cmd;
+		}
 
-	if($session->param("combine"))
-	{
-		my $consensus_graphics_file = $local_webpath . $sid . "_consensus_fdranalysis" . ".png";
-		$cmd = "perl RunConsensusGraphics.pl -V $out_verbosePeptideOutput -I $consensus_graphics_file -R $revString -D $decoySize\n";
-		print SHELL $cmd;
+		if($session->param("combine"))
+		{
+			my $consensus_graphics_file = $local_webpath . $sid . "_consensus_fdranalysis" . ".png";
+			$cmd = "perl RunConsensusGraphics.pl -V $out_verbosePeptideOutput -I $consensus_graphics_file -R $revString -D $decoySize\n";
+			print SHELL $cmd;
+		}
 	}
 	print SHELL "cd ".$local_cgibin."\n";
 	print SHELL "perl WriteStatus.pl -F $statusFile -T Creating_Summary\n";
@@ -1141,9 +1183,9 @@ sub RunAnalysis
 
 	if($email_cmd)
 	{
-		#print SHELL "cd ".$local_cgibin."\n";
-		#print SHELL $email_cmd."\n";
-		system($email_cmd);
+		print SHELL "cd ".$local_cgibin."\n";
+		print SHELL $email_cmd."\n";
+		#system($email_cmd);
 	}	
 	
 	close SHELL;	
@@ -1163,7 +1205,7 @@ sub RunAnalysis
 sub callTheMzIdentMLParser
 {
 			      
-	my($file_1,$file1_type,$file_2,$file2_type,$file_3,$file3_type,$omssaParamFileName) = @_;
+	my($file_1,$file1_type,$file_2,$file2_type,$file_3,$file3_type,$omssaParamFileName,$tandemParamFileName) = @_;
 	
 	my ($name_1, $path_1, $extension_1, $name_2, $path_2, $extension_2, $name_3, $path_3, $extension_3, $file_Upload1_afterParserCall, $file_Upload2_afterParserCall, $file_Upload3_afterParserCall);
 	## Add the mzid extension for the files to be converted...
@@ -1249,12 +1291,10 @@ sub callTheMzIdentMLParser
 			#$tempCmd = "cp ".$local_dir.$file_1." ".$local_webpath."input_files\nperl export_dat_2_Dec09.pl file=".$local_webpath."input_files/".$file_1." do_export=1 export_format=mzIdentML _ignoreionsscorebelow=0 _server_mudpit_switch=0.001 _requireboldred=0 _showallfromerrortolerant=0 _onlyerrortolerant=0 _noerrortolerant=0 show_same_sets=1 _showsubsets=1 _sigthreshold=1.0 report=0 unigene=0 _show_decoy_report=0 search_master=1 show_format=1 show_header=1 show_masses=1 show_params=1 show_mods=1 show_decoy=1 show_unassigned=1 protein_master=1 prot_desc=1 prot_score=1 prot_expect=1000 prot_mass=1 prot_matches=1 prot_cover=1 prot_len=1 prot_pi=0 prot_tax_str=1 prot_tax_id=1 prot_seq=1 prot_empai=0  prot_quant=0 peptide_master=1 pep_exp_mr=1 pep_exp_z=1 pep_calc_mr=1 pep_delta=1 pep_start=1 pep_end=1 pep_miss=1 pep_score=1 pep_homol=1 pep_ident=1 pep_expect=1 pep_rank=1 pep_seq=1 pep_frame=1 pep_var_mod=1 pep_num_match=1 pep_scan_title=1 pep_quant=0  query_all=1 > ".$session->param("file1_after_parser");
 			push(@cmdToExecuteMascot,$tempCmd);
 		}elsif($file1_parserCall eq 'Omssa'){
-			#$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_1 $omssaParamFileName $file_Upload1_afterParserCall";
 			$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_1 $omssaParamFileName ".$session->param("file1_after_parser");
 			push(@cmdToExecute,$tempCmd);
 		}elsif($file1_parserCall eq 'X!Tandem'){
-			#$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_1 $omssaParamFileName $file_Upload1_afterParserCall";
-			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_1 $omssaParamFileName ".$session->param("file1_after_parser");
+			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_1 $tandemParamFileName ".$session->param("file1_after_parser");
 			push(@cmdToExecute,$tempCmd);
 		}
 	}
@@ -1264,12 +1304,10 @@ sub callTheMzIdentMLParser
 			$tempCmd = "cp ".$local_dir.$file_2." ".$local_webpath."input_files\nperl export_dat_2_Dec09.pl file=".$local_webpath."input_files/".$file_2." do_export=1 export_format=mzIdentML _ignoreionsscorebelow=0 _server_mudpit_switch=0.001 _requireboldred=0 _showallfromerrortolerant=0 _onlyerrortolerant=0 _noerrortolerant=0 show_same_sets=1 _showsubsets=1 _sigthreshold=0.05 report=0 unigene=0 _show_decoy_report=0 search_master=1 show_format=1 show_header=1 show_masses=1 show_params=1 show_mods=1 show_decoy=0 show_unassigned=1 protein_master=1 prot_desc=1 prot_score=1 prot_expect=0.05 prot_mass=1 prot_matches=1 prot_cover=1 prot_len=1 prot_pi=0 prot_tax_str=1 prot_tax_id=1 prot_seq=1 prot_empai=0  prot_quant=0 peptide_master=1 pep_exp_mr=1 pep_exp_z=1 pep_calc_mr=1 pep_delta=1 pep_start=1 pep_end=1 pep_miss=1 pep_score=1 pep_homol=1 pep_ident=1 pep_expect=1 pep_rank=1 pep_seq=1 pep_frame=1 pep_var_mod=1 pep_num_match=1 pep_scan_title=1 pep_quant=0  query_all=1 > ".$session->param("file2_after_parser");
 			push(@cmdToExecuteMascot,$tempCmd);
 		}elsif($file2_parserCall eq 'Omssa'){
-			#$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_2 $omssaParamFileName $file_Upload2_afterParserCall";
 			$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_2 $omssaParamFileName ".$session->param("file2_after_parser");
 			push(@cmdToExecute,$tempCmd);
 		}elsif($file2_parserCall eq 'X!Tandem'){
-			#$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_2 $omssaParamFileName $file_Upload2_afterParserCall";
-			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_2 $omssaParamFileName ".$session->param("file2_after_parser");
+			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_2 $tandemParamFileName ".$session->param("file2_after_parser");
 
 			push(@cmdToExecute,$tempCmd);
 		}
@@ -1280,12 +1318,10 @@ sub callTheMzIdentMLParser
 			$tempCmd = "cp ".$local_dir.$file_3." ".$local_webpath."input_files\nperl export_dat_2_Dec09.pl file=".$local_webpath."input_files/".$file_3." do_export=1 export_format=mzIdentML _ignoreionsscorebelow=0 _server_mudpit_switch=0.001 _requireboldred=0 _showallfromerrortolerant=0 _onlyerrortolerant=0 _noerrortolerant=0 show_same_sets=1 _showsubsets=1 _sigthreshold=0.05 report=0 unigene=0 _show_decoy_report=0 search_master=1 show_format=1 show_header=1 show_masses=1 show_params=1 show_mods=1 show_decoy=0 show_unassigned=1 protein_master=1 prot_desc=1 prot_score=1 prot_expect=0.05 prot_mass=1 prot_matches=1 prot_cover=1 prot_len=1 prot_pi=0 prot_tax_str=1 prot_tax_id=1 prot_seq=1 prot_empai=0  prot_quant=0 peptide_master=1 pep_exp_mr=1 pep_exp_z=1 pep_calc_mr=1 pep_delta=1 pep_start=1 pep_end=1 pep_miss=1 pep_score=1 pep_homol=1 pep_ident=1 pep_expect=1 pep_rank=1 pep_seq=1 pep_frame=1 pep_var_mod=1 pep_num_match=1 pep_scan_title=1 pep_quant=0  query_all=1 > ".$session->param("file3_after_parser");
 			push(@cmdToExecuteMascot,$tempCmd);
 		}elsif($file3_parserCall eq 'Omssa'){
-			#$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_3 $omssaParamFileName $file_Upload3_afterParserCall";
 			$tempCmd = "perl csv2mzIdentML.pl $local_dir$file_3 $omssaParamFileName ".$session->param("file3_after_parser");
 			push(@cmdToExecute,$tempCmd);
 		}elsif($file3_parserCall eq 'X!Tandem'){
-			#$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_3 $omssaParamFileName $file_Upload3_afterParserCall";
-			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_3 $omssaParamFileName ".$session->param("file3_after_parser");
+			$tempCmd = "perl Tandem2mzIdentML.pl $local_dir$file_3 $tandemParamFileName ".$session->param("file3_after_parser");
 			push(@cmdToExecute,$tempCmd);
 		}
 	}
