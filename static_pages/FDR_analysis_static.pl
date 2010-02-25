@@ -33,8 +33,10 @@ use File::Basename;
 use Data::Dumper;
 use FindBin;
 use lib "$FindBin::Bin/";#050210
+use lib "$FindBin::Bin/webBasedParserCalls/";#220210
 #use lib "/var/www/localhost/cgi-bin/FDRAnalysis/";#DCW
 use CreateCSVParamFileForOmssa;
+use CreateCSVParamFileForTandem;
 use Cwd;
 
 use File::stat;
@@ -489,7 +491,7 @@ sub main_content()
 		}
 		#my $delcmd="qacct -j  242482";
 		#system($delcmd);
-		system("qstat\n");
+		#system("qstat\n");
 
 		print  $cgi->div({id=>"main_result"},
 			$cgi->div({id=>"content"},
@@ -530,11 +532,8 @@ sub main_content()
 
 			my $out_peptideOutput = $local_dir."peptideOutput_".$session->id.".txt";
 			my $new_peptideOutput = $out_peptideOutput;
-			$new_peptideOutput =~ s/$local_dir/$local_webpath/;
-			my $cmd = "cp " . $out_peptideOutput . " " . $new_peptideOutput;
-			system($cmd);
 			my $path_to_tmp = $webpath."tmp/";
-			$new_peptideOutput =~ s/$local_webpath/$path_to_tmp/;
+			$new_peptideOutput =~ s/$local_dir/$path_to_tmp/;
 			$blurb .= "<BR><font size=-2><I><B><sup>\#</sup></B> FDR method as decsribed in Kall et al. (2008) J. Proteome Res. 7:29-34.</I></FONT>"; 
 			$blurb .= "<BR><font size=-2><I><B>*</B> Combined method as described in Jones et al. (2009) Proteomics 9: 1220-9.</I></FONT>";
 
@@ -579,10 +578,23 @@ sub main_content()
 				if($FDR_image_file[$i])
 				{
 					$FDR_image_file[$i] =~ s/\.png/DeltaMass\.png/;
-					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Rank plot image\">";
+					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Delta mass plot image\">";
 				}
 			}
-			$blurb = "<BR><P>This is a plot of score vs. delta mass difference for all identifications. Delta mass is defined as the difference between the experimental and theoretical masses.  A normal distribution around Delta Mass=0 is expected.";
+			$blurb = "<BR><P>This is a plot of score vs. delta mass difference for all identifications. Delta mass is defined as the difference between the experimental and theoretical masses.  A normal distribution around Delta Mass=0 is expected for target identifications.";
+			$title = "Delta Mass";
+		}
+		elsif($cgi->param("result_view") eq "deltamassdist")
+		{
+			for(my $i=0 ; $i<scalar(@FDR_image_file) ; $i++) 
+			{
+				if($FDR_image_file[$i])
+				{
+					$FDR_image_file[$i] =~ s/\.png/DeltaMassDistribution\.png/;
+					$final_image_line .=  "<IMG SRC=\"$FDR_image_file[$i]\" title=\"Delta mass distribution plot image\">";
+				}
+			}
+			$blurb = "<BR><P>This is a plot of the number of identifications within a 0.1 window vs. delta mass difference for all identifications. Delta mass is defined as the difference between the experimental and theoretical masses.  A normal distribution around Delta Mass=0 is expected.";
 			$title = "Delta Mass";
 		}
 		elsif($cgi->param("result_view") eq "nterdist")
@@ -673,6 +685,7 @@ sub main_content()
 													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=combined"},"Peptide Overlap")),
 													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=rankplot"},"Rank plot")),
               	                 								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=deltamass"},"Delta Mass")),
+													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=deltamassdist"},"Delta Mass Distribution")),
               	                  								$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=scoredist"},"Score Distribution")),
 													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=nterdist"},"Start Position Distribution")),
 													$cgi->li($cgi->a({href=>$web_cgipath."FDR_analysis_static.pl?result_view=zoomscore"},"Estimated Correct/Incorrect"))
@@ -871,8 +884,8 @@ sub RunAnalysis
 	
 
 	# testing the code...for param file creation...
-	my $omssaParamFileName = createParamFileForParsers();
-	my $tandemParamFileName = $local_cgibin."Parsers/example_tandem_params.csv";
+	my $omssaParamFileName = createParamFileForParsers('omssa');
+	my $tandemParamFileName = createParamFileForParsers('tandem');
 
 	$shell = $shelldir."RunFDRAnalysis_" . $session->id . ".sh";
 
@@ -990,7 +1003,8 @@ sub RunAnalysis
 			$email_cmd .= ",".$local_webpath.$sid."_se3_fdranalysisGygiRank.png";
 		}
 	}
-	$cmd .= " -X $file1_searchEngine -Y $file2_searchEngine -Z $file3_searchEngine -D $decoySize -I $revString -O $out_peptideOutput -V $out_verbosePeptideOutput -A $out_tabForMzId -P $out_csvForMzId -C ".$session->param('max_expect')." -B $summary_file";
+	#$cmd .= " -X $file1_searchEngine -Y $file2_searchEngine -Z $file3_searchEngine -D $decoySize -I $revString -O $out_peptideOutput -V $out_verbosePeptideOutput -A $out_tabForMzId -P $out_csvForMzId -C ".$session->param('max_expect')." -B $summary_file";
+	$cmd .= " -X $file1_searchEngine -Y $file2_searchEngine -Z $file3_searchEngine -D $decoySize -I $revString -O $out_peptideOutput -V $out_verbosePeptideOutput -A $out_tabForMzId -P $out_csvForMzId";
 
 	#$cmd .= " -R 10";#TEST max rank param
 
@@ -1006,6 +1020,10 @@ sub RunAnalysis
 	#my $delcmd="qdel 242444";
 	#system($delcmd);
 	#$delcmd="qdel 239732";
+	#system($delcmd);
+	#my $delcmd="qmod -cj 242503";
+	#system($delcmd);
+	#$delcmd="qmod -cj 242504";
 	#system($delcmd);
 
 	my $statusFile = $summary_file;
@@ -1120,7 +1138,28 @@ sub RunAnalysis
 	print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
 
 	#Summary
-	$cmd = "perl RunSummary.pl -V $out_verbosePeptideOutput -S $summary_file -D $decoySize -T 0.01,0.05"; #DCW - last param (FDR cutoffs) should be set by user
+	my $userFDR = $session->param("fdr_value");
+	$userFDR =~ s/^\s+//;
+	$userFDR =~ s/\s+$//;
+	my $thresholdString;
+	if($userFDR eq "0.01" || $userFDR eq "0.05")
+	{
+		$thresholdString = "0.01,0.05";
+	}
+	elsif($userFDR<0.01)
+	{
+		$thresholdString = $userFDR.",0.01,0.05";
+	}
+	elsif($userFDR<0.01)
+	{
+		$thresholdString = "0.01,".$userFDR.",0.05";
+	}
+	else
+	{
+		$thresholdString = "0.01,0.05,".$userFDR;
+	}
+	#$cmd = "perl RunSummary.pl -V $out_verbosePeptideOutput -S $summary_file -D $decoySize -T 0.01,0.05"; #DCW - last param (FDR cutoffs) should be set by user
+	$cmd = "perl RunSummary.pl -V $out_verbosePeptideOutput -S $summary_file -D $decoySize -T ".$thresholdString;
 	if($session->param("nterminal"))
 	{
 		$cmd .= " -N";
@@ -1155,31 +1194,37 @@ sub RunAnalysis
 	print SHELL "perl WriteStatus.pl -F $statusFile -T Producing_Output_File\n";
 	
 	## Need to convert the final Protein ambiguity group csv file to mzid
-	my $out_protGroupTemp = $local_dir."tempProtAmbg_".$sid.".mzid";
+	#my $out_protGroupTemp = $local_dir."tempProtAmbg_".$sid.".mzid";
+	my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$sid.".mzid";
 	
 	#chdir("web-based-multiplesearch\\src\\Parsers"); # change directory to where the parser source code is...
 	print SHELL "cd ".$local_cgibin."Parsers"."\n";
 	#my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp";
-	my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp -protein_grouping";
+	#my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId $omssaParamFileName $out_protGroupTemp -protein_grouping";
+	my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId example_consensus_params.csv $out_protGroupMzId -protein_grouping";
+	#my $parseCmd = "perl csv2mzIdentML.pl $out_csvForMzId example_consensus_params.csv $out_protGroupMzId";
 	print PARAM "\n\n $parseCmd";
 	print SHELL $parseCmd."\n";
 	#system($parseCmd);
 	#chdir($currentWorkdir ); # come back to the original directory
 	
 	## Produce the final protein ambiguity group mzid file
-	my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$sid.".mzid";
-	
-	#chdir("web-based-multiplesearch\\src\\MzIdentMLPipeline"); # change directory to where the source code is...
-	print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
-	my $finalCmd = "perl testcode.pl $out_csvForMzId $out_protGroupTemp $out_protGroupMzId";
-	print PARAM "\n\n $finalCmd";
-	#system($finalCmd);  #DCW - commented out
-	print SHELL $finalCmd."\n"; 
+	#my $out_protGroupMzId = $local_dir."FinalProtAmbg_".$sid.".mzid";
 
 	my $newProtAmbigFile = $out_protGroupMzId;
 	$newProtAmbigFile =~ s/$local_dir/$local_webpath/;
 	my $copycmd = "cp " . $out_protGroupMzId . " " . $newProtAmbigFile;
 	print SHELL $copycmd."\n";
+	my $new_peptideOutput = $out_peptideOutput;
+	$new_peptideOutput =~ s/$local_dir/$local_webpath/;
+	$copycmd = "cp " . $out_peptideOutput . " " . $new_peptideOutput;
+	print SHELL $copycmd."\n";
+
+	#my $final_protGroupMzId = $local_dir."FinalFinalProtAmbg_".$sid.".mzid";
+	#print SHELL "cd ".$local_cgibin."MzIdentMLPipeline"."\n";
+	#my $finalCmd = "perl testcode.pl $out_csvForMzId $out_protGroupMzId $final_protGroupMzId";
+	#print PARAM "\n\n $finalCmd";
+	#print SHELL $finalCmd."\n"; 
 
 	if($email_cmd)
 	{
@@ -1372,6 +1417,8 @@ sub callTheMzIdentMLParser
 # @author Ritesh
 sub createParamFileForParsers
 {
+	my $se = shift;
+
 	open(PARAM,">>CmdFile"); 
 	
 	my %infoFromWebPage;
@@ -1394,12 +1441,23 @@ sub createParamFileForParsers
  
 	#my $mapFileNameFromWeb = "UMOD_TABLE.csv"; 
 	my $mapFileNameFromWeb = $local_cgibin."UMOD_TABLE.csv"; 
-	my $writeFileNameFromWeb = $local_dir."Out_omssa_".$sid."csv";
+	my $writeFileNameFromWeb = $local_dir."Out_".$se."_".$sid.".csv";
 
 	#chdir("web-based-multiplesearch\\src\\webBasedParserCalls");		
 
-	CreateCSVParamFileForOmssa::createParamFile(\%infoFromWebPage,\@fixedModFromWeb,\@varModsFromWeb,$mapFileNameFromWeb,$writeFileNameFromWeb);
-	
+	if($se eq 'omssa')
+	{
+		CreateCSVParamFileForOmssa::createParamFile(\%infoFromWebPage,\@fixedModFromWeb,\@varModsFromWeb,$mapFileNameFromWeb,$writeFileNameFromWeb);
+	}
+	elsif($se eq 'tandem')
+	{
+		CreateCSVParamFileForTandem::createParamFile(\%infoFromWebPage,\@fixedModFromWeb,\@varModsFromWeb,$mapFileNameFromWeb,$writeFileNameFromWeb);
+	}
+	else
+	{
+		print("Error creating param file for parser. Unknown search engine: ".$se."\n");
+	}
+
 	#chdir("$webpath"); # come back to the original directory...
 	
 	print PARAM Dumper(\%infoFromWebPage);
